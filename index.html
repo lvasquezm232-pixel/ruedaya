@@ -171,5 +171,122 @@
   initMap();renderDriver();renderAdmin();
 })();
 </script>
+<!-- Botón flotante "Descargar aplicación" -->
+<button id="btn-instalar-app" aria-label="Descargar aplicación" style="
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  z-index: 9999;
+  background-color: #047857;
+  color: #ffffff;
+  border: none;
+  border-radius: 9999px;
+  padding: 12px 20px;
+  font-family: system-ui, -apple-system, sans-serif;
+  font-size: 14px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  box-shadow: 0 8px 20px rgba(4, 120, 87, 0.35);
+  cursor: pointer;
+">
+  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+    <polyline points="7 10 12 15 17 10"></polyline>
+    <line x1="12" y1="15" x2="12" y2="3"></line>
+  </svg>
+  <span>Descargar aplicación</span>
+</button>
+
+<div id="modal-instalar-ayuda" style="
+  display: none;
+  position: fixed;
+  inset: 0;
+  z-index: 10000;
+  background: rgba(15, 23, 42, 0.55);
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  font-family: system-ui, -apple-system, sans-serif;
+">
+  <div style="
+    background: #ffffff;
+    border-radius: 16px;
+    max-width: 360px;
+    width: 100%;
+    padding: 22px;
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.15);
+    color: #1e293b;
+  ">
+    <h3 style="margin: 0 0 10px 0; font-size: 17px; color: #047857;">Instalar RuedaYa en tu celular</h3>
+    <p id="texto-ayuda-instalacion" style="margin: 0 0 16px 0; font-size: 14px; line-height: 1.5; color: #475569;"></p>
+    <button id="cerrar-modal-instalar" style="
+      width: 100%;
+      background: #047857;
+      color: #ffffff;
+      border: none;
+      border-radius: 10px;
+      padding: 10px;
+      font-weight: 600;
+      font-size: 14px;
+      cursor: pointer;
+    ">Entendido</button>
+  </div>
+</div>
+
+<script>
+  (function () {
+    let eventoInstalacion = null;
+    const btnInstalar = document.getElementById('btn-instalar-app');
+    const modalAyuda = document.getElementById('modal-instalar-ayuda');
+    const textoAyuda = document.getElementById('texto-ayuda-instalacion');
+    const btnCerrarModal = document.getElementById('cerrar-modal-instalar');
+
+    const yaInstalada = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
+    if (yaInstalada) {
+      btnInstalar.style.display = 'none';
+      return;
+    }
+
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('/sw.js').catch(() => {});
+    }
+
+    window.addEventListener('beforeinstallprompt', (e) => {
+      e.preventDefault();
+      eventoInstalacion = e;
+    });
+
+    btnInstalar.addEventListener('click', async () => {
+      if (eventoInstalacion) {
+        eventoInstalacion.prompt();
+        const { outcome } = await eventoInstalacion.userChoice;
+        if (outcome === 'accepted') {
+          btnInstalar.style.display = 'none';
+        }
+        eventoInstalacion = null;
+        return;
+      }
+
+      const esIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
+      if (esIOS) {
+        textoAyuda.innerHTML = '1. Abre esta página en <strong>Safari</strong>.<br>2. Toca el botón <strong>Compartir</strong> (cuadro con flecha hacia arriba).<br>3. Selecciona <strong>"Agregar a inicio"</strong>.';
+      } else {
+        textoAyuda.innerHTML = '1. Si abriste el enlace desde WhatsApp, toca los <strong>3 puntos (⋮)</strong> arriba a la derecha y elige <strong>"Abrir en Chrome"</strong>.<br>2. En Chrome, toca los <strong>3 puntos (⋮)</strong> y selecciona <strong>"Instalar aplicación"</strong>.';
+      }
+      modalAyuda.style.display = 'flex';
+    });
+
+    btnCerrarModal.addEventListener('click', () => {
+      modalAyuda.style.display = 'none';
+    });
+
+    window.addEventListener('appinstalled', () => {
+      btnInstalar.style.display = 'none';
+      eventoInstalacion = null;
+    });
+  })();
+</script>
 </body>
 </html>
