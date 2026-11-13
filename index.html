@@ -1,0 +1,175 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#0b6b53" />
+  <meta name="description" content="Conecta pasajeros y mototaxistas, negocia por chat y sigue el viaje en el mapa." />
+  <link rel="manifest" href="/manifest.webmanifest" />
+  <title>RuedaYa · Mototaxis</title>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
+  <style>
+    :root{--green:#08785d;--green-dark:#075944;--lime:#d9f99d;--ink:#14251f;--muted:#718078;--bg:#f4f7f5;--line:#e4ebe7;--white:#fff;--red:#dc5353;--amber:#b7791f;--shadow:0 14px 40px rgba(20,60,43,.09)}
+    *{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}button,input,textarea,select{font:inherit}button{cursor:pointer;border:0}button:disabled{opacity:.45;cursor:not-allowed}.app{max-width:1180px;margin:auto;min-height:100vh;padding:0 18px 36px}.topbar{height:76px;display:flex;align-items:center;justify-content:space-between;gap:16px}.brand{display:flex;align-items:center;gap:11px;font-weight:900;font-size:21px;letter-spacing:-.7px}.brand-mark{width:42px;height:42px;border-radius:14px;background:var(--green);color:white;display:grid;place-items:center;font-size:21px;box-shadow:0 7px 18px #08785d38}.brand small{display:block;color:var(--muted);font-size:10px;font-weight:700;letter-spacing:1.5px;margin-top:1px}.top-right{display:flex;align-items:center;gap:10px}.demo-pill{display:flex;align-items:center;gap:7px;padding:8px 11px;border:1px solid #dce8df;border-radius:99px;background:#f0f9f2;color:#27764b;font-size:11px;font-weight:800}.dot{height:7px;width:7px;border-radius:50%;background:#22a06b}.rolebar{display:flex;gap:7px;padding:5px;background:#e9efeb;border-radius:14px}.rolebar button{background:transparent;color:#66766d;padding:10px 15px;border-radius:10px;font-size:13px;font-weight:800}.rolebar button.active{background:#fff;color:var(--green);box-shadow:0 2px 8px #173c2510}.hero{display:flex;justify-content:space-between;align-items:end;margin:20px 0 18px;gap:18px}.eyebrow{font-size:11px;font-weight:900;color:var(--green);letter-spacing:1.8px;text-transform:uppercase}.hero h1{margin:7px 0 5px;font-size:clamp(25px,4vw,37px);letter-spacing:-1.5px;line-height:1.1}.hero p{margin:0;color:var(--muted);font-size:14px;line-height:1.5}.layout{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(330px,.9fr);gap:17px;align-items:start}.card{background:var(--white);border:1px solid var(--line);border-radius:20px;box-shadow:var(--shadow);overflow:hidden}.card-head{padding:19px 20px 13px;display:flex;justify-content:space-between;align-items:center;gap:12px}.card-head h2{margin:0;font-size:16px;letter-spacing:-.3px}.sub{font-size:11px;color:var(--muted);margin-top:4px}.map-wrap{padding:0 12px 12px}.map{height:400px;border-radius:15px;z-index:1;background:#e7eee9}.map-legend{display:flex;gap:13px;flex-wrap:wrap;padding:12px 8px 1px;color:var(--muted);font-size:11px}.legend-item{display:flex;align-items:center;gap:6px}.legend-dot{width:9px;height:9px;border-radius:50%;background:#0e9f6e}.legend-dot.pass{background:#2367de}.legend-dot.busy{background:#9aa69f}.panel{padding:18px}.section-title{font-size:13px;font-weight:900;margin:0 0 12px}.field{margin-bottom:12px}.field label{display:block;font-size:11px;font-weight:800;color:#617168;margin-bottom:6px}.input-wrap{position:relative}.field input,.field textarea,.field select{width:100%;border:1px solid #dfe8e2;border-radius:11px;background:#fbfdfb;padding:12px 13px;outline:none;color:var(--ink);font-size:13px}.field input:focus,.field textarea:focus{border-color:#68b79b;box-shadow:0 0 0 3px #0b805b15}.inline-fields{display:grid;grid-template-columns:1fr auto;gap:8px}.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;border-radius:11px;padding:12px 15px;font-size:12px;font-weight:900;transition:.15s}.btn-primary{background:var(--green);color:#fff}.btn-primary:hover{background:var(--green-dark)}.btn-soft{background:#edf6f1;color:var(--green)}.btn-ghost{background:#f2f5f3;color:#53645b}.btn-danger{background:#fff0ef;color:#bd4545}.btn-block{width:100%}.status-box{border:1px solid #e3eee7;border-radius:13px;padding:12px;background:#f7fbf8;margin:12px 0}.status-row{display:flex;align-items:center;justify-content:space-between;gap:10px}.status-label{font-size:11px;color:var(--muted);font-weight:800}.status-value{font-size:12px;font-weight:900;color:var(--green)}.muted{color:var(--muted)}.tiny{font-size:10px;color:var(--muted);line-height:1.5}.hidden{display:none!important}.queue{display:flex;flex-direction:column;gap:7px;margin:12px 0}.queue-row{display:flex;align-items:center;gap:10px;border:1px solid var(--line);border-radius:12px;padding:10px}.queue-num{width:27px;height:27px;border-radius:9px;display:grid;place-items:center;background:#eff3f0;font-size:11px;font-weight:900;color:#59695f;flex:none}.queue-row.active{border-color:#93d2b3;background:#f2fbf5}.queue-row.active .queue-num{background:var(--green);color:#fff}.queue-row .name{font-size:12px;font-weight:900}.queue-row .meta{font-size:10px;color:var(--muted);margin-top:3px}.tag{margin-left:auto;white-space:nowrap;background:#f0f3f1;color:#718078;border-radius:99px;padding:5px 8px;font-size:9px;font-weight:900}.tag.green{background:#e5f8eb;color:#21804e}.tag.amber{background:#fff6e5;color:#986816}.chat{border:1px solid var(--line);border-radius:14px;overflow:hidden;margin-top:13px}.chat-head{background:#f6faf7;padding:12px 13px;display:flex;justify-content:space-between;align-items:center}.chat-person{display:flex;align-items:center;gap:9px}.avatar{width:34px;height:34px;border-radius:11px;background:#dff4e8;color:var(--green);display:grid;place-items:center;font-weight:900}.chat-messages{height:190px;overflow:auto;padding:13px;background:#fff;display:flex;flex-direction:column;gap:9px}.bubble{max-width:86%;border-radius:13px;padding:9px 11px;font-size:12px;line-height:1.45;background:#f0f3f1;align-self:flex-start}.bubble.mine{background:#e4f5eb;align-self:flex-end}.bubble small{display:block;font-size:9px;color:#7d8b82;margin-bottom:3px}.chat-compose{display:flex;gap:7px;border-top:1px solid var(--line);padding:9px}.chat-compose input{min-width:0;flex:1;border:1px solid var(--line);border-radius:10px;padding:10px 11px;font-size:12px;outline:none}.chat-compose button{width:39px;border-radius:10px;background:var(--green);color:white}.confirm-box{margin-top:10px;padding:12px;border-radius:12px;background:#f1faf3;border:1px solid #d6efdd}.confirm-box strong{font-size:12px}.confirm-box p{font-size:11px;color:#64766b;line-height:1.5;margin:5px 0 10px}.two-btn{display:grid;grid-template-columns:1fr 1fr;gap:8px}.driver-card{padding:14px;border:1px solid var(--line);border-radius:13px;margin-bottom:9px}.driver-top{display:flex;align-items:center;gap:10px}.driver-top .avatar{width:40px;height:40px}.driver-top strong{font-size:12px}.driver-top small{display:block;font-size:10px;color:var(--muted);margin-top:3px}.driver-controls{display:flex;gap:7px;margin-top:11px}.driver-controls .btn{flex:1}.notice{border-radius:12px;background:#fff8e8;border:1px solid #f5e5bd;padding:11px 12px;color:#805c18;font-size:11px;line-height:1.5;margin:12px 0}.success-notice{background:#effaf3;border-color:#d5efdc;color:#267348}.empty{padding:23px 15px;text-align:center;border:1px dashed #d9e4dd;border-radius:13px;color:var(--muted);font-size:12px;line-height:1.6}.empty b{display:block;color:var(--ink);margin-bottom:5px}.stat-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:12px 0}.stat{border:1px solid var(--line);border-radius:12px;padding:11px}.stat b{font-size:19px;display:block;letter-spacing:-1px}.stat span{font-size:9px;color:var(--muted);font-weight:800}.footer{padding:18px 5px;color:#87938c;font-size:10px;display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap}.leaflet-control-attribution{font-size:9px!important}.leaflet-popup-content{font-family:inherit;font-size:12px}.map-pin{border:0;background:transparent}.pin{width:30px;height:30px;border:3px solid white;box-shadow:0 2px 9px #213c2c55;border-radius:50% 50% 50% 0;transform:rotate(-45deg);display:grid;place-items:center;color:white;font-size:13px}.pin span{transform:rotate(45deg)}.pin.driver{background:#0c8a65}.pin.me{background:#2865d9}.pin.busy{background:#8b9690}@media(max-width:850px){.layout{grid-template-columns:1fr}.map{height:330px}.hero{align-items:start;flex-direction:column}.topbar{height:auto;padding:14px 0;flex-wrap:wrap}.top-right{width:100%;justify-content:space-between}}@media(max-width:520px){.app{padding:0 11px 26px}.brand{font-size:18px}.rolebar button{padding:9px 11px;font-size:11px}.map{height:290px}.card-head,.panel{padding:15px}.topbar{gap:10px}.demo-pill{font-size:10px}}
+  </style>
+</head>
+<body>
+<div class="app">
+  <header class="topbar">
+    <div class="brand"><div class="brand-mark">↗</div><div>RuedaYa<small>MOTOTAXIS CERCA DE TI</small></div></div>
+    <div class="top-right"><div class="demo-pill"><span class="dot"></span> MODO DEMOSTRACIÓN</div><div class="rolebar" role="tablist" aria-label="Tipo de usuario"><button class="active" data-role="passenger">Pasajero</button><button data-role="driver">Mototaxista</button><button data-role="admin">Panel</button></div></div>
+  </header>
+
+  <section class="hero">
+    <div><div class="eyebrow">Tu viaje, a tu manera</div><h1 id="heroTitle">Encuentra tu mototaxi</h1><p id="heroDesc">Solicita una moto, conversa el precio en privado y confirma cuando estén de acuerdo.</p></div>
+    <div class="tiny">Prototipo funcional · Sin pagos ni tarifas públicas</div>
+  </section>
+
+  <main class="layout">
+    <section class="card">
+      <div class="card-head"><div><h2>Mapa en vivo</h2><div class="sub" id="mapSub">Ubicaciones de demostración hasta activar tu GPS</div></div><button class="btn btn-soft" id="locateBtn">◎ Mi ubicación</button></div>
+      <div class="map-wrap"><div id="map" class="map" aria-label="Mapa de mototaxis"></div><div class="map-legend"><span class="legend-item"><i class="legend-dot pass"></i> Tú</span><span class="legend-item"><i class="legend-dot"></i> Disponible</span><span class="legend-item"><i class="legend-dot busy"></i> Ocupado</span></div></div>
+    </section>
+
+    <section class="card">
+      <div id="passengerView" class="panel">
+        <h2 class="section-title">Solicitar un mototaxi</h2>
+        <div class="field"><label for="pickup">PUNTO DE RECOJO</label><div class="inline-fields"><input id="pickup" value="Mi ubicación actual" /><button class="btn btn-soft" id="gpsBtn" title="Usar GPS">GPS</button></div></div>
+        <div class="field"><label for="destination">¿A DÓNDE VAS?</label><input id="destination" placeholder="Ej. Plaza principal, mercado, hospital…" /></div>
+        <button class="btn btn-primary btn-block" id="requestBtn">⌁ Solicitar mototaxi</button>
+        <div class="tiny" style="margin-top:9px">El precio no se publica. Se acuerda únicamente en el chat privado.</div>
+        <div id="rideStatus" class="status-box hidden"><div class="status-row"><span class="status-label">ESTADO DE TU SOLICITUD</span><span class="status-value" id="rideStatusText">BUSCANDO</span></div><div class="tiny" id="rideStatusDetail" style="margin-top:7px"></div></div>
+        <div id="queueArea" class="hidden"><h3 class="section-title" style="margin-top:15px">Orden de respuesta</h3><div id="queueList" class="queue"></div></div>
+        <div id="chatArea" class="hidden">
+          <div class="chat"><div class="chat-head"><div class="chat-person"><div class="avatar" id="chatAvatar">M</div><div><strong id="chatName">Mototaxista</strong><div class="tiny" id="chatMeta">Tiene el turno de conversación</div></div></div><span class="tag green">TU TURNO</span></div><div class="chat-messages" id="messages"></div><div class="chat-compose"><input id="messageInput" placeholder="Escribe tu mensaje…" maxlength="500" /><button id="sendBtn" aria-label="Enviar mensaje">➤</button></div></div>
+          <div class="confirm-box"><strong>¿Ya acordaron el precio?</strong><p>Escribe la tarifa acordada. En esta demostración se simula la confirmación de ambas partes.</p><div class="field" style="margin:0 0 9px"><input id="fareInput" type="number" min="0.5" step="0.5" placeholder="Precio acordado en S/" /></div><div class="two-btn"><button class="btn btn-primary" id="confirmBtn">Aceptar trato</button><button class="btn btn-danger" id="nextBtn">No hay acuerdo</button></div></div>
+        </div>
+        <div id="confirmedArea" class="notice success-notice hidden"><b>✓ VIAJE CONFIRMADO</b><div id="confirmedText">El mototaxista está ocupado con tu servicio.</div><button class="btn btn-soft btn-block" id="finishBtn" style="margin-top:10px">Finalizar viaje (demo)</button></div>
+      </div>
+
+      <div id="driverView" class="panel hidden">
+        <h2 class="section-title">Panel del mototaxista</h2>
+        <div class="status-box"><div class="status-row"><span class="status-label">MI ESTADO</span><span class="status-value" id="driverState">DESCONECTADO</span></div><div class="tiny" style="margin-top:6px">Activa tu disponibilidad para recibir solicitudes de pasajeros cercanos.</div></div>
+        <button class="btn btn-primary btn-block" id="toggleOnline">Conectarme y estar disponible</button>
+        <div class="stat-grid"><div class="stat"><b id="driverJobs">0</b><span>VIAJES DEMO</span></div><div class="stat"><b id="driverQueue">—</b><span>TU ESTADO</span></div><div class="stat"><b id="driverGps">No</b><span>GPS ACTIVO</span></div></div>
+        <h3 class="section-title" style="margin-top:17px">Solicitudes cercanas</h3>
+        <div id="driverRequests" class="empty"><b>No hay solicitudes todavía</b>Cuando un pasajero solicite una moto, aparecerá aquí.</div>
+        <div class="notice">En el sistema real, la solicitud llega a todos los conductores disponibles dentro del radio configurado. El primero que responda ocupa el primer turno; los demás esperan.</div>
+      </div>
+
+      <div id="adminView" class="panel hidden">
+        <h2 class="section-title">Panel de administración</h2>
+        <div class="stat-grid"><div class="stat"><b id="adminDrivers">3</b><span>CONDUCTORES DEMO</span></div><div class="stat"><b id="adminRides">0</b><span>SOLICITUDES</span></div><div class="stat"><b id="adminActive">0</b><span>VIAJES ACTIVOS</span></div></div>
+        <h3 class="section-title">Reglas de asignación</h3>
+        <div class="queue-row"><div class="queue-num">1</div><div><div class="name">Primer conductor que responde</div><div class="meta">Obtiene el chat privado.</div></div><span class="tag green">Prioridad</span></div>
+        <div class="queue-row"><div class="queue-num">2</div><div><div class="name">Los demás esperan</div><div class="meta">Se ordenan por hora del servidor.</div></div><span class="tag amber">Cola</span></div>
+        <div class="queue-row"><div class="queue-num">3</div><div><div class="name">Sin acuerdo</div><div class="meta">Se cierra el chat y entra el siguiente.</div></div></div>
+        <div class="queue-row"><div class="queue-num">4</div><div><div class="name">Acuerdo doble</div><div class="meta">Ambos aceptan el mismo precio y se asigna.</div></div><span class="tag green">Confirmación</span></div>
+        <div class="notice">El panel de esta versión muestra datos de demostración. La administración real requerirá autenticación, roles y políticas de seguridad del servidor.</div>
+        <button class="btn btn-ghost btn-block" id="resetDemo">Reiniciar demostración</button>
+      </div>
+    </section>
+  </main>
+  <footer class="footer"><span>RuedaYa · Prototipo de movilidad local</span><span>Mapa © OpenStreetMap contributors · Datos de demostración</span></footer>
+</div>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+<script>
+(() => {
+  const $ = id => document.getElementById(id);
+  const state = { role:'passenger', userLat:-12.0464, userLng:-77.0428, hasGps:false, online:false, ride:null, responses:[], turnIndex:0, demoTimers:[], stats:{rides:0,jobs:0}, map:null, markers:[], driverMarkers:[] };
+  const demoDrivers = [
+    {id:'d1',name:'Carlos M.',vehicle:'Mototaxi azul · ABC-123',distance:0.45,delay:1300,latOffset:.006,lngOffset:.003},
+    {id:'d2',name:'José R.',vehicle:'Mototaxi rojo · BCD-234',distance:0.7,delay:2450,latOffset:-.004,lngOffset:.005},
+    {id:'d3',name:'Miguel A.',vehicle:'Mototaxi negro · CDE-345',distance:1.1,delay:3600,latOffset:.002,lngOffset:-.007}
+  ];
+  function esc(s){return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
+  function clearTimers(){state.demoTimers.forEach(clearTimeout);state.demoTimers=[];}
+  function pinIcon(type){const glyph=type==='me'?'●':'M';return L.divIcon({className:'map-pin',html:`<div class="pin ${type}"><span>${glyph}</span></div>`,iconSize:[30,30],iconAnchor:[15,30]});}
+  function initMap(){
+    state.map=L.map('map',{zoomControl:true}).setView([state.userLat,state.userLng],14);
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:19,attribution:'&copy; <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap</a> contributors'}).addTo(state.map);
+    refreshMarkers();
+    setTimeout(()=>state.map.invalidateSize(),250);
+  }
+  function refreshMarkers(){
+    if(!state.map)return;
+    state.markers.forEach(m=>state.map.removeLayer(m));state.markers=[];
+    state.driverMarkers.forEach(m=>state.map.removeLayer(m));state.driverMarkers=[];
+    const me=L.marker([state.userLat,state.userLng],{icon:pinIcon('me')}).addTo(state.map).bindPopup('<b>Tu ubicación</b>');state.markers.push(me);
+    demoDrivers.forEach((d,i)=>{
+      const marker=L.marker([state.userLat+d.latOffset,state.userLng+d.lngOffset],{icon:pinIcon(state.ride?.status==='CONFIRMADO'&&state.ride.driverId===d.id?'busy':'driver')}).addTo(state.map).bindPopup(`<b>${esc(d.name)}</b><br>${d.distance.toFixed(1)} km aprox. · Ubicación de demo`);
+      state.driverMarkers.push(marker);
+    });
+  }
+  function locate(){
+    if(!navigator.geolocation){alert('Este navegador no permite geolocalización.');return;}
+    $('mapSub').textContent='Solicitando permiso de ubicación…';
+    navigator.geolocation.getCurrentPosition(pos=>{
+      state.userLat=pos.coords.latitude;state.userLng=pos.coords.longitude;state.hasGps=true;
+      $('pickup').value='Mi ubicación GPS';$('mapSub').textContent='GPS activado · Mapa centrado en tu ubicación';
+      state.map.setView([state.userLat,state.userLng],16);refreshMarkers();$('driverGps').textContent='Sí';
+    },err=>{$('mapSub').textContent='No se pudo obtener el GPS; puedes escribir el punto de recojo.';alert('No se pudo obtener tu ubicación. Revisa los permisos de GPS del navegador.');},{enableHighAccuracy:true,timeout:12000,maximumAge:10000});
+  }
+  function setRole(role){
+    state.role=role;
+    document.querySelectorAll('[data-role]').forEach(b=>b.classList.toggle('active',b.dataset.role===role));
+    ['passenger','driver','admin'].forEach(r=>$(`${r}View`).classList.toggle('hidden',r!==role));
+    const content={passenger:['Encuentra tu mototaxi','Solicita una moto, conversa el precio en privado y confirma cuando estén de acuerdo.'],driver:['Conduce con solicitudes cercanas','Conéctate cuando estés disponible y responde a los pasajeros de tu zona.'],admin:['Control de la plataforma','Consulta las reglas de asignación y el estado de la demostración.']};
+    $('heroTitle').textContent=content[role][0];$('heroDesc').textContent=content[role][1];
+    setTimeout(()=>state.map.invalidateSize(),100);
+    renderDriver();renderAdmin();
+  }
+  function startRequest(){
+    const dest=$('destination').value.trim();if(!dest){alert('Escribe el destino del viaje.');$('destination').focus();return;}
+    clearTimers();state.responses=[];state.turnIndex=0;
+    state.ride={id:'demo-'+Date.now(),pickup:$('pickup').value.trim()||'Ubicación GPS',destination:dest,status:'BUSCANDO',driverId:null,fare:null,createdAt:Date.now()};state.stats.rides++;
+    $('rideStatus').classList.remove('hidden');$('rideStatusText').textContent='BUSCANDO';$('rideStatusDetail').textContent='Avisando a mototaxistas disponibles…';$('queueArea').classList.remove('hidden');$('chatArea').classList.add('hidden');$('confirmedArea').classList.add('hidden');$('requestBtn').disabled=true;
+    demoDrivers.forEach((d,i)=>{const t=setTimeout(()=>addResponse(d),d.delay);state.demoTimers.push(t);});renderAdmin();
+  }
+  function addResponse(driver){
+    if(!state.ride||state.ride.status==='CONFIRMADO'||state.ride.status==='FINALIZADO')return;
+    if(state.responses.some(r=>r.id===driver.id))return;
+    state.responses.push({...driver,order:state.responses.length+1,status:'ESPERANDO'});
+    if(state.responses.length===1)activateTurn(0);
+    renderQueue();renderAdmin();
+  }
+  function activateTurn(index){
+    if(!state.ride)return;
+    if(index>=state.responses.length){
+      state.turnIndex=index;state.ride.status='SIN_CONDUCTORES';state.ride.driverId=null;
+      $('rideStatusText').textContent='SIN CONDUCTORES';$('rideStatusDetail').textContent='Ningún conductor aceptó o no quedan respuestas en la cola.';$('chatArea').classList.add('hidden');$('requestBtn').disabled=false;return;
+    }
+    state.turnIndex=index;const d=state.responses[index];
+    state.responses.forEach((r,i)=>r.status=i<index?'FINALIZADO':i===index?'ACTIVO':'ESPERANDO');
+    state.ride.status='NEGOCIANDO';state.ride.driverId=d.id;
+    $('rideStatusText').textContent='NEGOCIANDO';$('rideStatusDetail').textContent=`Turno ${index+1}: ${d.name}. Los demás conductores esperan.`;
+    $('chatArea').classList.remove('hidden');$('chatName').textContent=d.name;$('chatAvatar').textContent=d.name.charAt(0);$('chatMeta').textContent=`A ${d.distance.toFixed(1)} km aprox. · ${d.vehicle}`;
+    $('messages').innerHTML='';appendMessage('conductor',`Buenas, soy ${d.name}. ¿A dónde se dirige?`);appendMessage('conductor','Dígame su destino y conversamos el precio.');
+    $('fareInput').value='';renderQueue();renderAdmin();refreshMarkers();
+  }
+  function renderQueue(){
+    $('queueList').innerHTML=state.responses.length?state.responses.map((r,i)=>`<div class="queue-row ${r.status==='ACTIVO'?'active':''}"><div class="queue-num">${i+1}</div><div style="min-width:0"><div class="name">${esc(r.name)}</div><div class="meta">${r.distance.toFixed(1)} km aprox. · ${esc(r.vehicle)}</div></div><span class="tag ${r.status==='ACTIVO'?'green':r.status==='ESPERANDO'?'amber':''}">${r.status==='ACTIVO'?'NEGOCIANDO':r.status==='ESPERANDO'?'EN ESPERA':'PASÓ'}</span></div>`).join(''):'<div class="empty">Esperando la primera respuesta de un mototaxista…</div>';
+  }
+  function appendMessage(who,text){const div=document.createElement('div');div.className='bubble'+(who==='pasajero'?' mine':'');div.innerHTML=`<small>${who==='pasajero'?'Tú':'Mototaxista'}</small>${esc(text)}`;$('messages').appendChild(div);$('messages').scrollTop=$('messages').scrollHeight;}
+  function sendMessage(){const text=$('messageInput').value.trim();if(!text||!state.ride||state.ride.status!=='NEGOCIANDO')return;$('messageInput').value='';appendMessage('pasajero',text);const d=state.responses[state.turnIndex];const replies=['Entiendo. ¿Le parece si coordinamos un punto de recojo exacto?','Podemos conversar. ¿Cuál sería su propuesta?','Estoy cerca de su ubicación. Dígame si está de acuerdo y confirmamos.'];const reply=replies[Math.floor(Math.random()*replies.length)];const t=setTimeout(()=>{if(state.ride?.status==='NEGOCIANDO'&&state.ride.driverId===d.id)appendMessage('conductor',reply);},850);state.demoTimers.push(t);}
+  function nextDriver(){if(!state.ride||state.ride.status!=='NEGOCIANDO')return;const old=state.responses[state.turnIndex];if(old)old.status='FINALIZADO';activateTurn(state.turnIndex+1);}
+  function confirmDeal(){if(!state.ride||state.ride.status!=='NEGOCIANDO')return;const fare=Number($('fareInput').value);if(!Number.isFinite(fare)||fare<=0){alert('Escribe un precio válido en soles.');return;}const d=state.responses[state.turnIndex];if(!confirm(`Simular confirmación de ambas partes por S/ ${fare.toFixed(2)} con ${d.name}?`))return;
+    state.ride.status='CONFIRMADO';state.ride.fare=fare;state.ride.driverId=d.id;state.stats.jobs++;d.status='CONFIRMADO';
+    $('rideStatusText').textContent='CONFIRMADO';$('rideStatusDetail').textContent='Ambas partes aceptaron el precio. El conductor queda ocupado.';$('chatArea').classList.add('hidden');$('confirmedArea').classList.remove('hidden');$('confirmedText').textContent=`${d.name} aceptó S/ ${fare.toFixed(2)}. Estado del mototaxista: OCUPADO. Este es un viaje de demostración.`;$('requestBtn').disabled=true;renderQueue();refreshMarkers();renderAdmin();
+  }
+  function finishRide(){if(!state.ride)return;state.ride.status='FINALIZADO';$('rideStatusText').textContent='FINALIZADO';$('rideStatusDetail').textContent='La demostración del viaje terminó.';$('confirmedArea').classList.add('hidden');$('requestBtn').disabled=false;state.responses=[];renderQueue();refreshMarkers();renderAdmin();}
+  function renderDriver(){ $('driverState').textContent=state.online?'DISPONIBLE':'DESCONECTADO';$('toggleOnline').textContent=state.online?'Desconectarme':'Conectarme y estar disponible';$('toggleOnline').className='btn '+(state.online?'btn-danger':'btn-primary')+' btn-block';$('driverJobs').textContent=state.stats.jobs;$('driverQueue').textContent=state.online?'ACTIVO':'—';$('driverGps').textContent=state.hasGps?'Sí':'No';
+    const hasRide=state.ride&&['BUSCANDO','NEGOCIANDO'].includes(state.ride.status);
+    $('driverRequests').innerHTML=hasRide?`<div class="driver-card"><div class="driver-top"><div class="avatar">P</div><div><strong>Solicitud de pasajero (demo)</strong><small>${esc(state.ride.pickup)} → ${esc(state.ride.destination)}</small></div></div><div class="tiny" style="margin-top:9px">${state.ride.status==='BUSCANDO'?'El pasajero está buscando mototaxi.':'Hay un conductor negociando en el primer turno.'}</div><div class="driver-controls"><button class="btn btn-soft" onclick="alert('Esta tarjeta es una vista de prueba; las respuestas se simulan en el perfil pasajero.')">Ver detalle</button></div></div>`:'<div class="empty"><b>No hay solicitudes todavía</b>Cuando un pasajero solicite una moto, aparecerá aquí.</div>';
+  }
+  function renderAdmin(){$('adminDrivers').textContent=demoDrivers.length;$('adminRides').textContent=state.stats.rides;$('adminActive').textContent=state.ride&&['CONFIRMADO','EN_CURSO'].includes(state.ride.status)?1:0;}
+  function reset(){clearTimers();state.ride=null;state.responses=[];state.turnIndex=0;state.stats={rides:0,jobs:0};$('rideStatus').classList.add('hidden');$('queueArea').classList.add('hidden');$('chatArea').classList.add('hidden');$('confirmedArea').classList.add('hidden');$('requestBtn').disabled=false;$('destination').value='';$('queueList').innerHTML='';renderAdmin();renderDriver();refreshMarkers();}
+  document.querySelectorAll('[data-role]').forEach(b=>b.addEventListener('click',()=>setRole(b.dataset.role)));
+  $('locateBtn').addEventListener('click',locate);$('gpsBtn').addEventListener('click',locate);$('requestBtn').addEventListener('click',startRequest);$('sendBtn').addEventListener('click',sendMessage);$('messageInput').addEventListener('keydown',e=>{if(e.key==='Enter')sendMessage();});$('nextBtn').addEventListener('click',nextDriver);$('confirmBtn').addEventListener('click',confirmDeal);$('finishBtn').addEventListener('click',finishRide);$('resetDemo').addEventListener('click',reset);
+  $('toggleOnline').addEventListener('click',()=>{state.online=!state.online;renderDriver();if(state.online&&!state.hasGps)locate();});
+  if('serviceWorker' in navigator && location.protocol.startsWith('http'))navigator.serviceWorker.register('/sw.js').catch(()=>{});
+  initMap();renderDriver();renderAdmin();
+})();
+</script>
+</body>
+</html>
