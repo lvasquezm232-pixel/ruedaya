@@ -1,5 +1,5 @@
-// RuedaYa · Service worker mínimo (instalable + respaldo sin conexión)
-const CACHE = 'ruedaya-v1';
+// Rueda Bca · Service worker mínimo (instalable + respaldo sin conexión)
+const CACHE = 'ruedabca-v1';
 const BASE = ['/', '/index.html', '/icon-192.png', '/icon-512.png'];
 
 self.addEventListener('install', (event) => {
