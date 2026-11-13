@@ -11,6 +11,8 @@
   <style>
     :root{--green:#08785d;--green-dark:#075944;--lime:#d9f99d;--ink:#14251f;--muted:#718078;--bg:#f4f7f5;--line:#e4ebe7;--white:#fff;--red:#dc5353;--amber:#b7791f;--shadow:0 14px 40px rgba(20,60,43,.09)}
     *{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}button,input,textarea,select{font:inherit}button{cursor:pointer;border:0}button:disabled{opacity:.45;cursor:not-allowed}.app{max-width:1180px;margin:auto;min-height:100vh;padding:0 18px 36px}.topbar{height:76px;display:flex;align-items:center;justify-content:space-between;gap:16px}.brand{display:flex;align-items:center;gap:11px;font-weight:900;font-size:21px;letter-spacing:-.7px}.brand-mark{width:42px;height:42px;border-radius:14px;background:var(--green);color:white;display:grid;place-items:center;font-size:21px;box-shadow:0 7px 18px #08785d38}.brand small{display:block;color:var(--muted);font-size:10px;font-weight:700;letter-spacing:1.5px;margin-top:1px}.top-right{display:flex;align-items:center;gap:10px}.demo-pill{display:flex;align-items:center;gap:7px;padding:8px 11px;border:1px solid #dce8df;border-radius:99px;background:#f0f9f2;color:#27764b;font-size:11px;font-weight:800}.dot{height:7px;width:7px;border-radius:50%;background:#22a06b}.rolebar{display:flex;gap:7px;padding:5px;background:#e9efeb;border-radius:14px}.rolebar button{background:transparent;color:#66766d;padding:10px 15px;border-radius:10px;font-size:13px;font-weight:800}.rolebar button.active{background:#fff;color:var(--green);box-shadow:0 2px 8px #173c2510}.hero{display:flex;justify-content:space-between;align-items:end;margin:20px 0 18px;gap:18px}.eyebrow{font-size:11px;font-weight:900;color:var(--green);letter-spacing:1.8px;text-transform:uppercase}.hero h1{margin:7px 0 5px;font-size:clamp(25px,4vw,37px);letter-spacing:-1.5px;line-height:1.1}.hero p{margin:0;color:var(--muted);font-size:14px;line-height:1.5}.layout{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(330px,.9fr);gap:17px;align-items:start}.card{background:var(--white);border:1px solid var(--line);border-radius:20px;box-shadow:var(--shadow);overflow:hidden}.card-head{padding:19px 20px 13px;display:flex;justify-content:space-between;align-items:center;gap:12px}.card-head h2{margin:0;font-size:16px;letter-spacing:-.3px}.sub{font-size:11px;color:var(--muted);margin-top:4px}.map-wrap{padding:0 12px 12px}.map{height:400px;border-radius:15px;z-index:1;background:#e7eee9}.map-legend{display:flex;gap:13px;flex-wrap:wrap;padding:12px 8px 1px;color:var(--muted);font-size:11px}.legend-item{display:flex;align-items:center;gap:6px}.legend-dot{width:9px;height:9px;border-radius:50%;background:#0e9f6e}.legend-dot.pass{background:#2367de}.legend-dot.busy{background:#9aa69f}.panel{padding:18px}.section-title{font-size:13px;font-weight:900;margin:0 0 12px}.field{margin-bottom:12px}.field label{display:block;font-size:11px;font-weight:800;color:#617168;margin-bottom:6px}.input-wrap{position:relative}.field input,.field textarea,.field select{width:100%;border:1px solid #dfe8e2;border-radius:11px;background:#fbfdfb;padding:12px 13px;outline:none;color:var(--ink);font-size:13px}.field input:focus,.field textarea:focus{border-color:#68b79b;box-shadow:0 0 0 3px #0b805b15}.inline-fields{display:grid;grid-template-columns:1fr auto;gap:8px}.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;border-radius:11px;padding:12px 15px;font-size:12px;font-weight:900;transition:.15s}.btn-primary{background:var(--green);color:#fff}.btn-primary:hover{background:var(--green-dark)}.btn-soft{background:#edf6f1;color:var(--green)}.btn-ghost{background:#f2f5f3;color:#53645b}.btn-danger{background:#fff0ef;color:#bd4545}.btn-block{width:100%}.status-box{border:1px solid #e3eee7;border-radius:13px;padding:12px;background:#f7fbf8;margin:12px 0}.status-row{display:flex;align-items:center;justify-content:space-between;gap:10px}.status-label{font-size:11px;color:var(--muted);font-weight:800}.status-value{font-size:12px;font-weight:900;color:var(--green)}.muted{color:var(--muted)}.tiny{font-size:10px;color:var(--muted);line-height:1.5}.hidden{display:none!important}.queue{display:flex;flex-direction:column;gap:7px;margin:12px 0}.queue-row{display:flex;align-items:center;gap:10px;border:1px solid var(--line);border-radius:12px;padding:10px}.queue-num{width:27px;height:27px;border-radius:9px;display:grid;place-items:center;background:#eff3f0;font-size:11px;font-weight:900;color:#59695f;flex:none}.queue-row.active{border-color:#93d2b3;background:#f2fbf5}.queue-row.active .queue-num{background:var(--green);color:#fff}.queue-row .name{font-size:12px;font-weight:900}.queue-row .meta{font-size:10px;color:var(--muted);margin-top:3px}.tag{margin-left:auto;white-space:nowrap;background:#f0f3f1;color:#718078;border-radius:99px;padding:5px 8px;font-size:9px;font-weight:900}.tag.green{background:#e5f8eb;color:#21804e}.tag.amber{background:#fff6e5;color:#986816}.chat{border:1px solid var(--line);border-radius:14px;overflow:hidden;margin-top:13px}.chat-head{background:#f6faf7;padding:12px 13px;display:flex;justify-content:space-between;align-items:center}.chat-person{display:flex;align-items:center;gap:9px}.avatar{width:34px;height:34px;border-radius:11px;background:#dff4e8;color:var(--green);display:grid;place-items:center;font-weight:900}.chat-messages{height:190px;overflow:auto;padding:13px;background:#fff;display:flex;flex-direction:column;gap:9px}.bubble{max-width:86%;border-radius:13px;padding:9px 11px;font-size:12px;line-height:1.45;background:#f0f3f1;align-self:flex-start}.bubble.mine{background:#e4f5eb;align-self:flex-end}.bubble small{display:block;font-size:9px;color:#7d8b82;margin-bottom:3px}.chat-compose{display:flex;gap:7px;border-top:1px solid var(--line);padding:9px}.chat-compose input{min-width:0;flex:1;border:1px solid var(--line);border-radius:10px;padding:10px 11px;font-size:12px;outline:none}.chat-compose button{width:39px;border-radius:10px;background:var(--green);color:white}.confirm-box{margin-top:10px;padding:12px;border-radius:12px;background:#f1faf3;border:1px solid #d6efdd}.confirm-box strong{font-size:12px}.confirm-box p{font-size:11px;color:#64766b;line-height:1.5;margin:5px 0 10px}.two-btn{display:grid;grid-template-columns:1fr 1fr;gap:8px}.driver-card{padding:14px;border:1px solid var(--line);border-radius:13px;margin-bottom:9px}.driver-top{display:flex;align-items:center;gap:10px}.driver-top .avatar{width:40px;height:40px}.driver-top strong{font-size:12px}.driver-top small{display:block;font-size:10px;color:var(--muted);margin-top:3px}.driver-controls{display:flex;gap:7px;margin-top:11px}.driver-controls .btn{flex:1}.notice{border-radius:12px;background:#fff8e8;border:1px solid #f5e5bd;padding:11px 12px;color:#805c18;font-size:11px;line-height:1.5;margin:12px 0}.success-notice{background:#effaf3;border-color:#d5efdc;color:#267348}.empty{padding:23px 15px;text-align:center;border:1px dashed #d9e4dd;border-radius:13px;color:var(--muted);font-size:12px;line-height:1.6}.empty b{display:block;color:var(--ink);margin-bottom:5px}.stat-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:12px 0}.stat{border:1px solid var(--line);border-radius:12px;padding:11px}.stat b{font-size:19px;display:block;letter-spacing:-1px}.stat span{font-size:9px;color:var(--muted);font-weight:800}.footer{padding:18px 5px;color:#87938c;font-size:10px;display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap}.leaflet-control-attribution{font-size:9px!important}.leaflet-popup-content{font-family:inherit;font-size:12px}.map-pin{border:0;background:transparent}.pin{width:30px;height:30px;border:3px solid white;box-shadow:0 2px 9px #213c2c55;border-radius:50% 50% 50% 0;transform:rotate(-45deg);display:grid;place-items:center;color:white;font-size:13px}.pin span{transform:rotate(45deg)}.pin.driver{background:#0c8a65}.pin.me{background:#2865d9}.pin.busy{background:#8b9690}@media(max-width:850px){.layout{grid-template-columns:1fr}.map{height:330px}.hero{align-items:start;flex-direction:column}.topbar{height:auto;padding:14px 0;flex-wrap:wrap}.top-right{width:100%;justify-content:space-between}}@media(max-width:520px){.app{padding:0 11px 26px}.brand{font-size:18px}.rolebar button{padding:9px 11px;font-size:11px}.map{height:290px}.card-head,.panel{padding:15px}.topbar{gap:10px}.demo-pill{font-size:10px}}
+  .pin.dest{background:#dc5353}
+    .route-eta{position:absolute;transform:translate(-50%,-135%);white-space:nowrap;background:#1a73e8;color:#fff;font:700 13px system-ui,sans-serif;padding:6px 11px;border-radius:999px;border:2px solid #fff;box-shadow:0 2px 8px rgba(0,0,0,.4)}
   </style>
 </head>
 <body>
@@ -84,10 +86,16 @@
   ];
   function esc(s){return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
   function clearTimers(){state.demoTimers.forEach(clearTimeout);state.demoTimers=[];}
-  function pinIcon(type){const glyph=type==='me'?'●':'M';return L.divIcon({className:'map-pin',html:`<div class="pin ${type}"><span>${glyph}</span></div>`,iconSize:[30,30],iconAnchor:[15,30]});}
+  function pinIcon(type){const glyph=type==='me'?'●':type==='dest'?'⚑':'M';return L.divIcon({className:'map-pin',html:`<div class="pin ${type}"><span>${glyph}</span></div>`,iconSize:[30,30],iconAnchor:[15,30]});}
   function initMap(){
     state.map=L.map('map',{zoomControl:true}).setView([state.userLat,state.userLng],14);
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:19,attribution:'&copy; <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap</a> contributors'}).addTo(state.map);
+    const esri=p=>L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/'+p+'/MapServer/tile/{z}/{y}/{x}',{maxZoom:20,maxNativeZoom:18});
+    const sat=L.layerGroup([esri('World_Imagery'),esri('Reference/World_Transportation'),esri('Reference/World_Boundaries_and_Places')]).addTo(state.map);
+    const osm=L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:20,maxNativeZoom:19});
+    state.map.attributionControl.addAttribution('Imágenes &copy; Esri, Maxar, Earthstar Geographics &middot; Datos &copy; <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap</a>');
+    L.control.layers({'Satélite':sat,'Mapa':osm},null,{position:'topright'}).addTo(state.map);
+    state.map.on('dragstart',()=>{state.follow=false;});
+    state.map.on('click',onMapClick);
     refreshMarkers();
     setTimeout(()=>state.map.invalidateSize(),250);
   }
@@ -96,6 +104,7 @@
     state.markers.forEach(m=>state.map.removeLayer(m));state.markers=[];
     state.driverMarkers.forEach(m=>state.map.removeLayer(m));state.driverMarkers=[];
     const me=L.marker([state.userLat,state.userLng],{icon:pinIcon('me')}).addTo(state.map).bindPopup('<b>Tu ubicación</b>');state.markers.push(me);
+    state.acc=null;if(state.hasGps){state.acc=L.circle([state.userLat,state.userLng],{radius:state.accuracy||20,color:'#2865d9',weight:1,fillColor:'#2865d9',fillOpacity:.15,interactive:false}).addTo(state.map);state.markers.push(state.acc);}
     demoDrivers.forEach((d,i)=>{
       const marker=L.marker([state.userLat+d.latOffset,state.userLng+d.lngOffset],{icon:pinIcon(state.ride?.status==='CONFIRMADO'&&state.ride.driverId===d.id?'busy':'driver')}).addTo(state.map).bindPopup(`<b>${esc(d.name)}</b><br>${d.distance.toFixed(1)} km aprox. · Ubicación de demo`);
       state.driverMarkers.push(marker);
@@ -103,12 +112,68 @@
   }
   function locate(){
     if(!navigator.geolocation){alert('Este navegador no permite geolocalización.');return;}
-    $('mapSub').textContent='Solicitando permiso de ubicación…';
-    navigator.geolocation.getCurrentPosition(pos=>{
-      state.userLat=pos.coords.latitude;state.userLng=pos.coords.longitude;state.hasGps=true;
-      $('pickup').value='Mi ubicación GPS';$('mapSub').textContent='GPS activado · Mapa centrado en tu ubicación';
-      state.map.setView([state.userLat,state.userLng],16);refreshMarkers();$('driverGps').textContent='Sí';
-    },err=>{$('mapSub').textContent='No se pudo obtener el GPS; puedes escribir el punto de recojo.';alert('No se pudo obtener tu ubicación. Revisa los permisos de GPS del navegador.');},{enableHighAccuracy:true,timeout:12000,maximumAge:10000});
+    if(state.watchId!=null){
+      if(state.hasGps){state.follow=true;state.map.flyTo([state.userLat,state.userLng],18,{duration:1.2});}
+      return;
+    }
+    $('mapSub').textContent='Buscando tu ubicación exacta…';
+    let first=true;
+    state.watchId=navigator.geolocation.watchPosition(pos=>{
+      state.userLat=pos.coords.latitude;state.userLng=pos.coords.longitude;state.accuracy=pos.coords.accuracy;state.hasGps=true;
+      $('driverGps').textContent='Sí';
+      if(!(state.routeLayers&&state.routeLayers.length))$('mapSub').textContent='GPS en tiempo real · precisión ±'+Math.round(pos.coords.accuracy)+' m';
+      if(first){
+        first=false;state.follow=true;$('pickup').value='Mi ubicación GPS';refreshMarkers();
+        state.map.flyTo([state.userLat,state.userLng],18,{duration:1.4});
+        if(state.afterFix){const f=state.afterFix;state.afterFix=null;f();}
+      }else{moveMe();if(state.follow)state.map.panTo([state.userLat,state.userLng]);}
+    },err=>{
+      if(err.code===1){navigator.geolocation.clearWatch(state.watchId);state.watchId=null;$('mapSub').textContent='Permiso de ubicación denegado; puedes escribir el punto de recojo.';alert('No se pudo obtener tu ubicación. Activa el permiso de ubicación del navegador y vuelve a tocar GPS.');}
+      else{$('mapSub').textContent='Buscando señal GPS…';}
+    },{enableHighAccuracy:true,maximumAge:1000,timeout:20000});
+  }
+  function moveMe(){
+    const ll=[state.userLat,state.userLng];
+    if(state.markers[0])state.markers[0].setLatLng(ll);
+    if(state.acc)state.acc.setLatLng(ll).setRadius(state.accuracy||20);
+    state.driverMarkers.forEach((m,i)=>m.setLatLng([ll[0]+demoDrivers[i].latOffset,ll[1]+demoDrivers[i].lngOffset]));
+  }
+  function wipeRoute(){(state.routeLayers||[]).forEach(l=>state.map.removeLayer(l));state.routeLayers=[];}
+  function clearRoute(){wipeRoute();state.destPoint=null;state.destLabel='';state.routeSeq=(state.routeSeq||0)+1;}
+  function onMapClick(e){
+    if(state.role!=='passenger'||state.ride)return;
+    state.destPoint={lat:e.latlng.lat,lng:e.latlng.lng};state.destLabel='Punto marcado en el mapa';
+    $('destination').value=state.destLabel;drawRoute();
+  }
+  async function drawRoute(){
+    if(!state.hasGps){state.afterFix=drawRoute;locate();return;}
+    const text=$('destination').value.trim();if(!text)return;
+    const seq=state.routeSeq=(state.routeSeq||0)+1;
+    try{
+      let to=state.destPoint&&text===state.destLabel?state.destPoint:null;
+      if(!to){
+        $('mapSub').textContent='Buscando el destino…';
+        const b=.4,u='https://nominatim.openstreetmap.org/search?format=jsonv2&limit=1&accept-language=es&countrycodes=pe&viewbox='+[state.userLng-b,state.userLat+b,state.userLng+b,state.userLat-b].join(',')+'&q='+encodeURIComponent(text);
+        const g=await (await fetch(u)).json();
+        if(seq!==state.routeSeq)return;
+        if(!g.length){$('mapSub').textContent='No encontré ese lugar. Toca el mapa para marcar el destino.';return;}
+        to={lat:+g[0].lat,lng:+g[0].lon};state.destPoint=to;state.destLabel=text;
+      }
+      // Solo ruta en AUTO (perfil "driving"); se ignoran a pie y moto.
+      const r=await (await fetch('https://router.project-osrm.org/route/v1/driving/'+state.userLng+','+state.userLat+';'+to.lng+','+to.lat+'?overview=full&geometries=geojson')).json();
+      if(seq!==state.routeSeq)return;
+      if(!r.routes||!r.routes.length){$('mapSub').textContent='No hay ruta en auto hasta ese punto.';return;}
+      const rt=r.routes[0],pts=rt.geometry.coordinates.map(c=>[c[1],c[0]]);
+      const min=Math.max(1,Math.round(rt.duration/60)),km=(rt.distance/1000).toFixed(1);
+      wipeRoute();
+      const casing=L.polyline(pts,{color:'#fff',weight:11,opacity:.95,interactive:false}).addTo(state.map);
+      const line=L.polyline(pts,{color:'#1a73e8',weight:7,opacity:1,interactive:false}).addTo(state.map);
+      const dest=L.marker([to.lat,to.lng],{icon:pinIcon('dest')}).addTo(state.map);
+      const eta=L.marker(pts[Math.floor(pts.length/2)],{icon:L.divIcon({className:'',html:'<div class="route-eta">🚗 '+min+' min · '+km+' km</div>',iconSize:[0,0]}),interactive:false}).addTo(state.map);
+      state.routeLayers=[casing,line,dest,eta];state.follow=false;
+      state.map.fitBounds(line.getBounds(),{padding:[60,60]});
+      $('mapSub').textContent='Ruta en auto · '+min+' min · '+km+' km';
+    }catch(e){$('mapSub').textContent='No se pudo trazar la ruta. Revisa tu conexión.';}
   }
   function setRole(role){
     state.role=role;
@@ -125,6 +190,7 @@
     state.ride={id:'demo-'+Date.now(),pickup:$('pickup').value.trim()||'Ubicación GPS',destination:dest,status:'BUSCANDO',driverId:null,fare:null,createdAt:Date.now()};state.stats.rides++;
     $('rideStatus').classList.remove('hidden');$('rideStatusText').textContent='BUSCANDO';$('rideStatusDetail').textContent='Avisando a mototaxistas disponibles…';$('queueArea').classList.remove('hidden');$('chatArea').classList.add('hidden');$('confirmedArea').classList.add('hidden');$('requestBtn').disabled=true;
     demoDrivers.forEach((d,i)=>{const t=setTimeout(()=>addResponse(d),d.delay);state.demoTimers.push(t);});renderAdmin();
+    if(!(state.routeLayers&&state.routeLayers.length))drawRoute();
   }
   function addResponse(driver){
     if(!state.ride||state.ride.status==='CONFIRMADO'||state.ride.status==='FINALIZADO')return;
@@ -163,7 +229,7 @@
     $('driverRequests').innerHTML=hasRide?`<div class="driver-card"><div class="driver-top"><div class="avatar">P</div><div><strong>Solicitud de pasajero (demo)</strong><small>${esc(state.ride.pickup)} → ${esc(state.ride.destination)}</small></div></div><div class="tiny" style="margin-top:9px">${state.ride.status==='BUSCANDO'?'El pasajero está buscando mototaxi.':'Hay un conductor negociando en el primer turno.'}</div><div class="driver-controls"><button class="btn btn-soft" onclick="alert('Esta tarjeta es una vista de prueba; las respuestas se simulan en el perfil pasajero.')">Ver detalle</button></div></div>`:'<div class="empty"><b>No hay solicitudes todavía</b>Cuando un pasajero solicite una moto, aparecerá aquí.</div>';
   }
   function renderAdmin(){$('adminDrivers').textContent=demoDrivers.length;$('adminRides').textContent=state.stats.rides;$('adminActive').textContent=state.ride&&['CONFIRMADO','EN_CURSO'].includes(state.ride.status)?1:0;}
-  function reset(){clearTimers();state.ride=null;state.responses=[];state.turnIndex=0;state.stats={rides:0,jobs:0};$('rideStatus').classList.add('hidden');$('queueArea').classList.add('hidden');$('chatArea').classList.add('hidden');$('confirmedArea').classList.add('hidden');$('requestBtn').disabled=false;$('destination').value='';$('queueList').innerHTML='';renderAdmin();renderDriver();refreshMarkers();}
+  function reset(){clearTimers();clearRoute();state.ride=null;state.responses=[];state.turnIndex=0;state.stats={rides:0,jobs:0};$('rideStatus').classList.add('hidden');$('queueArea').classList.add('hidden');$('chatArea').classList.add('hidden');$('confirmedArea').classList.add('hidden');$('requestBtn').disabled=false;$('destination').value='';$('queueList').innerHTML='';renderAdmin();renderDriver();refreshMarkers();}
   document.querySelectorAll('[data-role]').forEach(b=>b.addEventListener('click',()=>setRole(b.dataset.role)));
   $('locateBtn').addEventListener('click',locate);$('gpsBtn').addEventListener('click',locate);$('requestBtn').addEventListener('click',startRequest);$('sendBtn').addEventListener('click',sendMessage);$('messageInput').addEventListener('keydown',e=>{if(e.key==='Enter')sendMessage();});$('nextBtn').addEventListener('click',nextDriver);$('confirmBtn').addEventListener('click',confirmDeal);$('finishBtn').addEventListener('click',finishRide);$('resetDemo').addEventListener('click',reset);
   $('toggleOnline').addEventListener('click',()=>{state.online=!state.online;renderDriver();if(state.online&&!state.hasGps)locate();});
