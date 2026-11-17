@@ -188,8 +188,10 @@
     renderDriver();renderAdmin();
   }
   // ===== Solicitudes compartidas entre celulares (servidor: /api/rides) =====
-  const API='/api/rides';
-  const post=b=>fetch(API,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(b)}).then(r=>r.json());
+  // Si abres la app desde otro sitio (no Vercel), pon aquí tu dirección, ej: 'https://TU-PROYECTO.vercel.app'
+  const API_BASE='';
+  const API=API_BASE+'/api/rides';
+  const post=b=>fetch(API,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(b)}).then(async r=>{let j={};try{j=await r.json();}catch(e){}if(!r.ok&&!j.error)j.error='Error '+r.status+' (no existe /api/rides o falló el servidor)';return j;});
   const get=q=>fetch(API+q,{cache:'no-store'}).then(r=>r.json());
   const uid=(()=>{let v='';try{v=localStorage.getItem('rb_uid')||'';if(!v){v='u'+Math.random().toString(36).slice(2,10);localStorage.setItem('rb_uid',v);}}catch(e){v=v||'u'+Math.random().toString(36).slice(2,10);}return v;})();
   const kmBetween=(a,b,c,d)=>{if([a,b,c,d].some(x=>typeof x!=='number'))return null;const t=x=>x*Math.PI/180,h=Math.sin(t(c-a)/2)**2+Math.cos(t(a))*Math.cos(t(c))*Math.sin(t(d-b)/2)**2;return 12742*Math.asin(Math.sqrt(h));};
@@ -208,8 +210,8 @@
     state.ride={id,status:'BUSCANDO',driverId:null,pickup:$('pickup').value.trim()||'Ubicación GPS',destination:dest};state.responses=[];state.stats.rides++;
     $('rideStatus').classList.remove('hidden');$('rideStatusText').textContent='BUSCANDO';$('rideStatusDetail').textContent='Avisando a los mototaxistas conectados…';
     $('queueArea').classList.remove('hidden');$('chatArea').classList.add('hidden');$('confirmedArea').classList.add('hidden');$('requestBtn').disabled=true;renderQueue();
-    post({action:'create',ride:{id,pickup:state.ride.pickup,pickupLat:state.userLat,pickupLng:state.userLng,destination:dest,destLat:dp.lat,destLng:dp.lng}}).then(j=>{if(j.error)throw new Error(j.error);}).catch(()=>{
-      clearInterval(state.pollT);state.ride=null;$('rideStatusText').textContent='SIN CONEXIÓN';$('rideStatusDetail').textContent='No se pudo enviar la solicitud. Revisa tu internet e inténtalo de nuevo.';$('queueArea').classList.add('hidden');$('requestBtn').disabled=false;});
+    post({action:'create',ride:{id,pickup:state.ride.pickup,pickupLat:state.userLat,pickupLng:state.userLng,destination:dest,destLat:dp.lat,destLng:dp.lng}}).then(j=>{if(j.error)throw new Error(j.error);}).catch(e=>{
+      clearInterval(state.pollT);state.ride=null;$('rideStatusText').textContent='SIN CONEXIÓN';$('rideStatusDetail').textContent='No se pudo enviar la solicitud: '+((e&&e.message)||'sin respuesta')+'. Abre la app desde tu dirección de Vercel y revisa que Upstash esté conectado.';$('queueArea').classList.add('hidden');$('requestBtn').disabled=false;});
     state.pollT=setInterval(pollRide,2500);renderAdmin();
     if(!(state.routeLayers&&state.routeLayers.length))drawRoute();
   }
