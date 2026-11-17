@@ -41,12 +41,12 @@
         <button class="btn btn-primary btn-block" id="requestBtn">⌁ Solicitar mototaxi</button>
         <div class="tiny" style="margin-top:9px">El precio no se publica. Se acuerda únicamente en el chat privado.</div>
         <div id="rideStatus" class="status-box hidden"><div class="status-row"><span class="status-label">ESTADO DE TU SOLICITUD</span><span class="status-value" id="rideStatusText">BUSCANDO</span></div><div class="tiny" id="rideStatusDetail" style="margin-top:7px"></div></div>
-        <div id="queueArea" class="hidden"><h3 class="section-title" style="margin-top:15px">Orden de respuesta</h3><div id="queueList" class="queue"></div></div>
+        <div id="queueArea" class="hidden"><h3 class="section-title" style="margin-top:15px">Orden de respuesta</h3><div id="queueList" class="queue"></div><button class="btn btn-ghost btn-block" id="cancelReq" style="margin-top:10px">Cancelar solicitud</button></div>
         <div id="chatArea" class="hidden">
           <div class="chat"><div class="chat-head"><div class="chat-person"><div class="avatar" id="chatAvatar">M</div><div><strong id="chatName">Mototaxista</strong><div class="tiny" id="chatMeta">Tiene el turno de conversación</div></div></div><span class="tag green">TU TURNO</span></div><div class="chat-messages" id="messages"></div><div class="chat-compose"><input id="messageInput" placeholder="Escribe tu mensaje…" maxlength="500" /><button id="sendBtn" aria-label="Enviar mensaje">➤</button></div></div>
-          <div class="confirm-box"><strong>¿Ya acordaron el precio?</strong><p>Escribe la tarifa acordada. En esta demostración se simula la confirmación de ambas partes.</p><div class="field" style="margin:0 0 9px"><input id="fareInput" type="number" min="0.5" step="0.5" placeholder="Precio acordado en S/" /></div><div class="two-btn"><button class="btn btn-primary" id="confirmBtn">Aceptar trato</button><button class="btn btn-danger" id="nextBtn">No hay acuerdo</button></div></div>
+          <div class="confirm-box"><strong>¿Ya acordaron el precio?</strong><p>Escribe la tarifa acordada. El viaje se confirma cuando el mototaxista acepta el mismo precio.</p><div class="field" style="margin:0 0 9px"><input id="fareInput" type="number" min="0.5" step="0.5" placeholder="Precio acordado en S/" /></div><div class="two-btn"><button class="btn btn-primary" id="confirmBtn">Aceptar trato</button><button class="btn btn-danger" id="nextBtn">No hay acuerdo</button></div></div>
         </div>
-        <div id="confirmedArea" class="notice success-notice hidden"><b>✓ VIAJE CONFIRMADO</b><div id="confirmedText">El mototaxista está ocupado con tu servicio.</div><button class="btn btn-soft btn-block" id="finishBtn" style="margin-top:10px">Finalizar viaje (demo)</button></div>
+        <div id="confirmedArea" class="notice success-notice hidden"><b>✓ VIAJE CONFIRMADO</b><div id="confirmedText">El mototaxista está ocupado con tu servicio.</div><button class="btn btn-soft btn-block" id="finishBtn" style="margin-top:10px">Finalizar viaje</button></div>
       </div>
 
       <div id="driverView" class="panel hidden">
@@ -56,7 +56,14 @@
         <div class="stat-grid"><div class="stat"><b id="driverJobs">0</b><span>VIAJES DEMO</span></div><div class="stat"><b id="driverQueue">—</b><span>TU ESTADO</span></div><div class="stat"><b id="driverGps">No</b><span>GPS ACTIVO</span></div></div>
         <h3 class="section-title" style="margin-top:17px">Solicitudes cercanas</h3>
         <div id="driverRequests" class="empty"><b>No hay solicitudes todavía</b>Cuando un pasajero solicite una moto, aparecerá aquí.</div>
-        <div class="notice">En el sistema real, la solicitud llega a todos los conductores disponibles dentro del radio configurado. El primero que responda ocupa el primer turno; los demás esperan.</div>
+        <div id="driverChat" class="hidden" style="margin-top:15px">
+          <h3 class="section-title">Viaje activo</h3>
+          <div class="tiny" id="dcTitle" style="margin-bottom:8px"></div>
+          <div class="chat"><div class="chat-messages" id="dcMessages"></div><div class="chat-compose"><input id="dcInput" placeholder="Escribe tu mensaje…" maxlength="500" /><button id="dcSend" aria-label="Enviar mensaje">➤</button></div></div>
+          <div id="dcNeg" class="confirm-box"><strong id="dcNote">Conversa con el pasajero y acuerden el precio.</strong><div class="field" style="margin:9px 0"><input id="dcFare" type="number" min="0.5" step="0.5" placeholder="Precio acordado en S/" /></div><div class="two-btn"><button class="btn btn-primary" id="dcOffer">Aceptar precio</button><button class="btn btn-danger" id="dcNext">No hay acuerdo</button></div></div>
+          <div id="dcDone" class="notice success-notice hidden"><b>✓ VIAJE CONFIRMADO</b><div id="dcDoneText"></div><button class="btn btn-soft btn-block" id="dcFinish" style="margin-top:10px">Finalizar viaje</button></div>
+        </div>
+        <div class="notice">Mantén esta pantalla abierta mientras estés conectado para recibir solicitudes. El primero que acepta tiene el primer turno de chat; los demás esperan en cola.</div>
       </div>
 
       <div id="adminView" class="panel hidden">
@@ -105,10 +112,6 @@
     state.driverMarkers.forEach(m=>state.map.removeLayer(m));state.driverMarkers=[];
     const me=L.marker([state.userLat,state.userLng],{icon:pinIcon('me')}).addTo(state.map).bindPopup('<b>Tu ubicación</b>');state.markers.push(me);
     state.acc=null;if(state.hasGps){state.acc=L.circle([state.userLat,state.userLng],{radius:state.accuracy||20,color:'#2865d9',weight:1,fillColor:'#2865d9',fillOpacity:.15,interactive:false}).addTo(state.map);state.markers.push(state.acc);}
-    demoDrivers.forEach((d,i)=>{
-      const marker=L.marker([state.userLat+d.latOffset,state.userLng+d.lngOffset],{icon:pinIcon(state.ride?.status==='CONFIRMADO'&&state.ride.driverId===d.id?'busy':'driver')}).addTo(state.map).bindPopup(`<b>${esc(d.name)}</b><br>${d.distance.toFixed(1)} km aprox. · Ubicación de demo`);
-      state.driverMarkers.push(marker);
-    });
   }
   function locate(){
     if(!navigator.geolocation){alert('Este navegador no permite geolocalización.');return;}
@@ -184,55 +187,130 @@
     setTimeout(()=>state.map.invalidateSize(),100);
     renderDriver();renderAdmin();
   }
+  // ===== Solicitudes compartidas entre celulares (servidor: /api/rides) =====
+  const API='/api/rides';
+  const post=b=>fetch(API,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(b)}).then(r=>r.json());
+  const get=q=>fetch(API+q,{cache:'no-store'}).then(r=>r.json());
+  const uid=(()=>{let v='';try{v=localStorage.getItem('rb_uid')||'';if(!v){v='u'+Math.random().toString(36).slice(2,10);localStorage.setItem('rb_uid',v);}}catch(e){v=v||'u'+Math.random().toString(36).slice(2,10);}return v;})();
+  const kmBetween=(a,b,c,d)=>{if([a,b,c,d].some(x=>typeof x!=='number'))return null;const t=x=>x*Math.PI/180,h=Math.sin(t(c-a)/2)**2+Math.cos(t(a))*Math.cos(t(c))*Math.sin(t(d-b)/2)**2;return 12742*Math.asin(Math.sqrt(h));};
+  function renderChat(el,msgs,me,other){
+    const key=(msgs[0]?msgs[0].t:'')+':'+msgs.length;if(el.dataset.k===key)return;el.dataset.k=key;
+    el.innerHTML=msgs.map(m=>`<div class="bubble${m.from===me?' mine':''}"><small>${m.from===me?'Tú':other}</small>${esc(m.text)}</div>`).join('');
+    el.scrollTop=el.scrollHeight;
+  }
+  // ---- Pasajero ----
   function startRequest(){
     const dest=$('destination').value.trim();if(!dest){alert('Escribe el destino del viaje.');$('destination').focus();return;}
-    clearTimers();state.responses=[];state.turnIndex=0;
-    state.ride={id:'demo-'+Date.now(),pickup:$('pickup').value.trim()||'Ubicación GPS',destination:dest,status:'BUSCANDO',driverId:null,fare:null,createdAt:Date.now()};state.stats.rides++;
-    $('rideStatus').classList.remove('hidden');$('rideStatusText').textContent='BUSCANDO';$('rideStatusDetail').textContent='Avisando a mototaxistas disponibles…';$('queueArea').classList.remove('hidden');$('chatArea').classList.add('hidden');$('confirmedArea').classList.add('hidden');$('requestBtn').disabled=true;
-    demoDrivers.forEach((d,i)=>{const t=setTimeout(()=>addResponse(d),d.delay);state.demoTimers.push(t);});renderAdmin();
+    if(!state.hasGps){state.afterFix=startRequest;locate();return;}
+    clearInterval(state.pollT);
+    const id='r'+Date.now().toString(36)+Math.random().toString(36).slice(2,5);
+    const dp=state.destPoint&&dest===state.destLabel?state.destPoint:{};
+    state.ride={id,status:'BUSCANDO',driverId:null,pickup:$('pickup').value.trim()||'Ubicación GPS',destination:dest};state.responses=[];state.stats.rides++;
+    $('rideStatus').classList.remove('hidden');$('rideStatusText').textContent='BUSCANDO';$('rideStatusDetail').textContent='Avisando a los mototaxistas conectados…';
+    $('queueArea').classList.remove('hidden');$('chatArea').classList.add('hidden');$('confirmedArea').classList.add('hidden');$('requestBtn').disabled=true;renderQueue();
+    post({action:'create',ride:{id,pickup:state.ride.pickup,pickupLat:state.userLat,pickupLng:state.userLng,destination:dest,destLat:dp.lat,destLng:dp.lng}}).then(j=>{if(j.error)throw new Error(j.error);}).catch(()=>{
+      clearInterval(state.pollT);state.ride=null;$('rideStatusText').textContent='SIN CONEXIÓN';$('rideStatusDetail').textContent='No se pudo enviar la solicitud. Revisa tu internet e inténtalo de nuevo.';$('queueArea').classList.add('hidden');$('requestBtn').disabled=false;});
+    state.pollT=setInterval(pollRide,2500);renderAdmin();
     if(!(state.routeLayers&&state.routeLayers.length))drawRoute();
   }
-  function addResponse(driver){
-    if(!state.ride||state.ride.status==='CONFIRMADO'||state.ride.status==='FINALIZADO')return;
-    if(state.responses.some(r=>r.id===driver.id))return;
-    state.responses.push({...driver,order:state.responses.length+1,status:'ESPERANDO'});
-    if(state.responses.length===1)activateTurn(0);
-    renderQueue();renderAdmin();
-  }
-  function activateTurn(index){
+  async function pollRide(){
     if(!state.ride)return;
-    if(index>=state.responses.length){
-      state.turnIndex=index;state.ride.status='SIN_CONDUCTORES';state.ride.driverId=null;
-      $('rideStatusText').textContent='SIN CONDUCTORES';$('rideStatusDetail').textContent='Ningún conductor aceptó o no quedan respuestas en la cola.';$('chatArea').classList.add('hidden');$('requestBtn').disabled=false;return;
+    try{const j=await get('?id='+encodeURIComponent(state.ride.id));if(j.ride)applyRide(j.ride);}catch(e){}
+  }
+  function endRide(txt){
+    clearInterval(state.pollT);state.ride=null;state.responses=[];
+    ['queueArea','chatArea','confirmedArea'].forEach(i=>$(i).classList.add('hidden'));
+    if(txt){$('rideStatusText').textContent=txt[0];$('rideStatusDetail').textContent=txt[1];}else $('rideStatus').classList.add('hidden');
+    $('requestBtn').disabled=false;$('destination').value='';$('messages').dataset.k='';clearRoute();renderQueue();refreshMarkers();
+  }
+  function applyRide(r){
+    if(!state.ride)return;
+    if(r.status==='FINALIZADO'||r.status==='CANCELADO'){endRide(r.status==='FINALIZADO'?['FINALIZADO','El viaje terminó. Puedes pedir otro mototaxi.']:['CANCELADO','La solicitud fue cancelada.']);return;}
+    state.ride.status=r.status;state.ride.driverId=r.driverId;state.responses=r.responses;
+    const d=r.responses[r.turn],neg=r.status==='NEGOCIANDO'&&d,ok=r.status==='CONFIRMADO'&&d;
+    $('rideStatusText').textContent=r.status;
+    $('chatArea').classList.toggle('hidden',!neg);$('confirmedArea').classList.toggle('hidden',!ok);
+    if(r.status==='BUSCANDO')$('rideStatusDetail').textContent=r.responses.length?'Ningún conductor activo ahora; esperando nuevas respuestas…':'Esperando que un mototaxista conectado acepte tu solicitud…';
+    if(neg){
+      $('rideStatusDetail').textContent=r.offers.pasajero?`Propusiste S/ ${Number(r.offers.pasajero).toFixed(2)}. Esperando que el conductor acepte el mismo precio…`:`Turno ${r.turn+1}: ${d.name}. Los demás conductores esperan.`;
+      $('chatName').textContent=d.name;$('chatAvatar').textContent=d.name.charAt(0);$('chatMeta').textContent=(d.distance!=null?`A ${d.distance.toFixed(1)} km aprox. · `:'')+d.vehicle;
+      renderChat($('messages'),r.messages.filter(m=>m.driverId===r.driverId),'pasajero','Mototaxista');
+      $('fareInput').placeholder=r.offers.conductor?`El conductor propone S/ ${r.offers.conductor}`:'Precio acordado en S/';
     }
-    state.turnIndex=index;const d=state.responses[index];
-    state.responses.forEach((r,i)=>r.status=i<index?'FINALIZADO':i===index?'ACTIVO':'ESPERANDO');
-    state.ride.status='NEGOCIANDO';state.ride.driverId=d.id;
-    $('rideStatusText').textContent='NEGOCIANDO';$('rideStatusDetail').textContent=`Turno ${index+1}: ${d.name}. Los demás conductores esperan.`;
-    $('chatArea').classList.remove('hidden');$('chatName').textContent=d.name;$('chatAvatar').textContent=d.name.charAt(0);$('chatMeta').textContent=`A ${d.distance.toFixed(1)} km aprox. · ${d.vehicle}`;
-    $('messages').innerHTML='';appendMessage('conductor',`Buenas, soy ${d.name}. ¿A dónde se dirige?`);appendMessage('conductor','Dígame su destino y conversamos el precio.');
-    $('fareInput').value='';renderQueue();renderAdmin();refreshMarkers();
+    if(ok){$('rideStatusDetail').textContent='Ambas partes aceptaron el mismo precio. El conductor queda ocupado.';$('confirmedText').textContent=`${d.name} (${d.vehicle}) aceptó S/ ${Number(r.fare).toFixed(2)}. Estado del mototaxista: OCUPADO.`;}
+    $('requestBtn').disabled=true;renderQueue();
   }
   function renderQueue(){
-    $('queueList').innerHTML=state.responses.length?state.responses.map((r,i)=>`<div class="queue-row ${r.status==='ACTIVO'?'active':''}"><div class="queue-num">${i+1}</div><div style="min-width:0"><div class="name">${esc(r.name)}</div><div class="meta">${r.distance.toFixed(1)} km aprox. · ${esc(r.vehicle)}</div></div><span class="tag ${r.status==='ACTIVO'?'green':r.status==='ESPERANDO'?'amber':''}">${r.status==='ACTIVO'?'NEGOCIANDO':r.status==='ESPERANDO'?'EN ESPERA':'PASÓ'}</span></div>`).join(''):'<div class="empty">Esperando la primera respuesta de un mototaxista…</div>';
+    $('queueList').innerHTML=state.responses.length?state.responses.map((r,i)=>`<div class="queue-row ${r.status==='ACTIVO'?'active':''}"><div class="queue-num">${i+1}</div><div style="min-width:0"><div class="name">${esc(r.name)}</div><div class="meta">${r.distance!=null?r.distance.toFixed(1)+' km aprox. · ':''}${esc(r.vehicle)}</div></div><span class="tag ${r.status==='ACTIVO'||r.status==='CONFIRMADO'?'green':r.status==='ESPERANDO'?'amber':''}">${r.status==='ACTIVO'?'NEGOCIANDO':r.status==='CONFIRMADO'?'CONFIRMADO':r.status==='ESPERANDO'?'EN ESPERA':'PASÓ'}</span></div>`).join(''):'<div class="empty">Esperando la primera respuesta de un mototaxista…</div>';
   }
-  function appendMessage(who,text){const div=document.createElement('div');div.className='bubble'+(who==='pasajero'?' mine':'');div.innerHTML=`<small>${who==='pasajero'?'Tú':'Mototaxista'}</small>${esc(text)}`;$('messages').appendChild(div);$('messages').scrollTop=$('messages').scrollHeight;}
-  function sendMessage(){const text=$('messageInput').value.trim();if(!text||!state.ride||state.ride.status!=='NEGOCIANDO')return;$('messageInput').value='';appendMessage('pasajero',text);const d=state.responses[state.turnIndex];const replies=['Entiendo. ¿Le parece si coordinamos un punto de recojo exacto?','Podemos conversar. ¿Cuál sería su propuesta?','Estoy cerca de su ubicación. Dígame si está de acuerdo y confirmamos.'];const reply=replies[Math.floor(Math.random()*replies.length)];const t=setTimeout(()=>{if(state.ride?.status==='NEGOCIANDO'&&state.ride.driverId===d.id)appendMessage('conductor',reply);},850);state.demoTimers.push(t);}
-  function nextDriver(){if(!state.ride||state.ride.status!=='NEGOCIANDO')return;const old=state.responses[state.turnIndex];if(old)old.status='FINALIZADO';activateTurn(state.turnIndex+1);}
-  function confirmDeal(){if(!state.ride||state.ride.status!=='NEGOCIANDO')return;const fare=Number($('fareInput').value);if(!Number.isFinite(fare)||fare<=0){alert('Escribe un precio válido en soles.');return;}const d=state.responses[state.turnIndex];if(!confirm(`Simular confirmación de ambas partes por S/ ${fare.toFixed(2)} con ${d.name}?`))return;
-    state.ride.status='CONFIRMADO';state.ride.fare=fare;state.ride.driverId=d.id;state.stats.jobs++;d.status='CONFIRMADO';
-    $('rideStatusText').textContent='CONFIRMADO';$('rideStatusDetail').textContent='Ambas partes aceptaron el precio. El conductor queda ocupado.';$('chatArea').classList.add('hidden');$('confirmedArea').classList.remove('hidden');$('confirmedText').textContent=`${d.name} aceptó S/ ${fare.toFixed(2)}. Estado del mototaxista: OCUPADO. Este es un viaje de demostración.`;$('requestBtn').disabled=true;renderQueue();refreshMarkers();renderAdmin();
+  function sendMessage(){const text=$('messageInput').value.trim();if(!text||!state.ride||state.ride.status!=='NEGOCIANDO')return;$('messageInput').value='';post({action:'message',id:state.ride.id,driverId:state.ride.driverId,from:'pasajero',text}).then(pollRide);}
+  function nextDriver(){if(!state.ride||state.ride.status!=='NEGOCIANDO')return;post({action:'next',id:state.ride.id,driverId:state.ride.driverId}).then(pollRide);}
+  function confirmDeal(){
+    if(!state.ride||state.ride.status!=='NEGOCIANDO')return;
+    const fare=Number($('fareInput').value);if(!Number.isFinite(fare)||fare<=0){alert('Escribe un precio válido en soles.');return;}
+    post({action:'offer',id:state.ride.id,driverId:state.ride.driverId,role:'pasajero',fare}).then(pollRide);
+    $('rideStatusDetail').textContent=`Propusiste S/ ${fare.toFixed(2)}. Esperando que el conductor acepte el mismo precio…`;
   }
-  function finishRide(){if(!state.ride)return;state.ride.status='FINALIZADO';$('rideStatusText').textContent='FINALIZADO';$('rideStatusDetail').textContent='La demostración del viaje terminó.';$('confirmedArea').classList.add('hidden');$('requestBtn').disabled=false;state.responses=[];renderQueue();refreshMarkers();renderAdmin();}
-  function renderDriver(){ $('driverState').textContent=state.online?'DISPONIBLE':'DESCONECTADO';$('toggleOnline').textContent=state.online?'Desconectarme':'Conectarme y estar disponible';$('toggleOnline').className='btn '+(state.online?'btn-danger':'btn-primary')+' btn-block';$('driverJobs').textContent=state.stats.jobs;$('driverQueue').textContent=state.online?'ACTIVO':'—';$('driverGps').textContent=state.hasGps?'Sí':'No';
-    const hasRide=state.ride&&['BUSCANDO','NEGOCIANDO'].includes(state.ride.status);
-    $('driverRequests').innerHTML=hasRide?`<div class="driver-card"><div class="driver-top"><div class="avatar">P</div><div><strong>Solicitud de pasajero (demo)</strong><small>${esc(state.ride.pickup)} → ${esc(state.ride.destination)}</small></div></div><div class="tiny" style="margin-top:9px">${state.ride.status==='BUSCANDO'?'El pasajero está buscando mototaxi.':'Hay un conductor negociando en el primer turno.'}</div><div class="driver-controls"><button class="btn btn-soft" onclick="alert('Esta tarjeta es una vista de prueba; las respuestas se simulan en el perfil pasajero.')">Ver detalle</button></div></div>`:'<div class="empty"><b>No hay solicitudes todavía</b>Cuando un pasajero solicite una moto, aparecerá aquí.</div>';
+  function finishRide(){if(!state.ride)return;post({action:'finish',id:state.ride.id}).then(pollRide);}
+  // ---- Mototaxista ----
+  function driverInfo(){
+    let n='',v='';try{n=localStorage.getItem('rb_dn')||'';v=localStorage.getItem('rb_dv')||'';}catch(e){}
+    if(!n){n=(prompt('Tu nombre (lo verá el pasajero):')||'').trim();if(!n)return null;v=(prompt('Tu mototaxi y placa (ej. Mototaxi negro · ABC-123):')||'').trim();try{localStorage.setItem('rb_dn',n);localStorage.setItem('rb_dv',v);}catch(e){}}
+    return {id:uid,name:n,vehicle:v||'Mototaxi'};
+  }
+  function toggleOnline(){
+    if(state.online){state.online=false;clearTimeout(state.dT);state.openRides=[];state.dRide=null;renderDriver();return;}
+    const info=driverInfo();if(!info){alert('Escribe tu nombre para conectarte.');return;}
+    state.me=info;state.online=true;if(!state.hasGps)locate();renderDriver();pollDriver();
+  }
+  async function pollDriver(){
+    clearTimeout(state.dT);if(!state.online)return;
+    try{
+      const j=await get('?open=1');state.openRides=j.rides||[];state.seen=state.seen||{};
+      state.dRide=state.openRides.find(r=>r.driverId===uid&&(r.status==='NEGOCIANDO'||r.status==='CONFIRMADO'))||null;
+      const fresh=state.openRides.some(r=>r.status==='BUSCANDO'&&!state.seen[r.id]);
+      state.openRides.forEach(r=>{state.seen[r.id]=1;});
+      if(fresh&&navigator.vibrate)navigator.vibrate([200,100,200]);
+      renderDriver();
+    }catch(e){$('driverQueue').textContent='SIN RED';}
+    if(state.online)state.dT=setTimeout(pollDriver,state.dRide?2000:6000);
+  }
+  function acceptRide(id){
+    const r=(state.openRides||[]).find(x=>x.id===id);if(!r||!state.me)return;
+    post({action:'respond',id,driver:{...state.me,lat:state.hasGps?state.userLat:null,lng:state.hasGps?state.userLng:null,distance:state.hasGps?kmBetween(state.userLat,state.userLng,r.pickupLat,r.pickupLng):null}}).then(pollDriver);
+  }
+  const dPost=b=>post({id:state.dRide&&state.dRide.id,driverId:uid,...b}).then(pollDriver);
+  function dcSend(){const t=$('dcInput').value.trim();if(!t||!state.dRide)return;$('dcInput').value='';dPost({action:'message',from:'conductor',text:t});}
+  function dcOffer(){const f=Number($('dcFare').value);if(!state.dRide||!Number.isFinite(f)||f<=0){alert('Escribe un precio válido en soles.');return;}dPost({action:'offer',role:'conductor',fare:f});$('dcNote').textContent=`Ofreciste S/ ${f.toFixed(2)}. Esperando que el pasajero acepte el mismo precio…`;}
+  function dcNext(){if(state.dRide)dPost({action:'next'});}
+  function dcFinish(){if(state.dRide){state.stats.jobs++;dPost({action:'finish'});}}
+  function clearPickup(){if(state.pickupM&&state.map)state.map.removeLayer(state.pickupM);state.pickupM=null;state.pickupId=null;}
+  function renderDriver(){
+    const a=state.dRide;
+    $('driverState').textContent=!state.online?'DESCONECTADO':a?(a.status==='CONFIRMADO'?'OCUPADO':'NEGOCIANDO'):'DISPONIBLE';
+    $('toggleOnline').textContent=state.online?'Desconectarme':'Conectarme y estar disponible';$('toggleOnline').className='btn '+(state.online?'btn-danger':'btn-primary')+' btn-block';
+    $('driverJobs').textContent=state.stats.jobs;$('driverQueue').textContent=state.online?'ACTIVO':'—';$('driverGps').textContent=state.hasGps?'Sí':'No';
+    const list=state.online?(state.openRides||[]).filter(r=>{const m=r.responses.find(x=>x.id===uid);return (!a||r.id!==a.id)&&['BUSCANDO','NEGOCIANDO'].includes(r.status)&&!(m&&m.status==='FINALIZADO');}):[];
+    $('driverRequests').innerHTML=list.length?list.map(r=>{const m=r.responses.find(x=>x.id===uid),dk=state.hasGps?kmBetween(state.userLat,state.userLng,r.pickupLat,r.pickupLng):null;return `<div class="driver-card"><div class="driver-top"><div class="avatar">P</div><div><strong>Solicitud de pasajero</strong><small>${esc(r.pickup)} → ${esc(r.destination)}</small></div></div><div class="tiny" style="margin-top:9px">${dk!=null?`A ${dk.toFixed(1)} km de ti · `:''}${r.status==='BUSCANDO'?'Esperando conductor.':'Otro conductor está negociando; puedes ponerte en cola.'}</div><div class="driver-controls">${m?'<span class="tag amber">EN ESPERA</span>':`<button class="btn btn-primary" data-accept="${esc(r.id)}">Aceptar solicitud</button>`}</div></div>`;}).join(''):'<div class="empty"><b>No hay solicitudes todavía</b>Cuando un pasajero solicite una moto, aparecerá aquí.</div>';
+    $('driverChat').classList.toggle('hidden',!a);
+    if(a){
+      const conf=a.status==='CONFIRMADO';
+      $('dcTitle').textContent=`${a.pickup} → ${a.destination}`;
+      renderChat($('dcMessages'),a.messages.filter(m=>m.driverId===uid),'conductor','Pasajero');
+      $('dcNeg').classList.toggle('hidden',conf);$('dcDone').classList.toggle('hidden',!conf);
+      $('dcNote').textContent=a.offers.pasajero?`El pasajero propone S/ ${Number(a.offers.pasajero).toFixed(2)}. Escribe el mismo precio para aceptar.`:'Conversa con el pasajero y acuerden el precio.';
+      if(conf)$('dcDoneText').textContent=`Viaje confirmado por S/ ${Number(a.fare).toFixed(2)}. Recoge al pasajero en: ${a.pickup}.`;
+      if(state.pickupId!==a.id&&a.pickupLat!=null&&state.map){clearPickup();state.pickupId=a.id;state.pickupM=L.marker([a.pickupLat,a.pickupLng],{icon:pinIcon('dest')}).addTo(state.map).bindPopup('<b>Pasajero</b>');state.map.flyTo([a.pickupLat,a.pickupLng],17,{duration:1.2});}
+    }else clearPickup();
   }
   function renderAdmin(){$('adminDrivers').textContent=demoDrivers.length;$('adminRides').textContent=state.stats.rides;$('adminActive').textContent=state.ride&&['CONFIRMADO','EN_CURSO'].includes(state.ride.status)?1:0;}
-  function reset(){clearTimers();clearRoute();state.ride=null;state.responses=[];state.turnIndex=0;state.stats={rides:0,jobs:0};$('rideStatus').classList.add('hidden');$('queueArea').classList.add('hidden');$('chatArea').classList.add('hidden');$('confirmedArea').classList.add('hidden');$('requestBtn').disabled=false;$('destination').value='';$('queueList').innerHTML='';renderAdmin();renderDriver();refreshMarkers();}
+  function reset(){clearTimers();clearRoute();clearInterval(state.pollT);if(state.ride)post({action:'cancel',id:state.ride.id});state.ride=null;state.responses=[];state.turnIndex=0;state.stats={rides:0,jobs:0};$('rideStatus').classList.add('hidden');$('queueArea').classList.add('hidden');$('chatArea').classList.add('hidden');$('confirmedArea').classList.add('hidden');$('requestBtn').disabled=false;$('destination').value='';$('queueList').innerHTML='';renderAdmin();renderDriver();refreshMarkers();}
   document.querySelectorAll('[data-role]').forEach(b=>b.addEventListener('click',()=>setRole(b.dataset.role)));
   $('locateBtn').addEventListener('click',locate);$('gpsBtn').addEventListener('click',locate);$('requestBtn').addEventListener('click',startRequest);$('sendBtn').addEventListener('click',sendMessage);$('messageInput').addEventListener('keydown',e=>{if(e.key==='Enter')sendMessage();});$('nextBtn').addEventListener('click',nextDriver);$('confirmBtn').addEventListener('click',confirmDeal);$('finishBtn').addEventListener('click',finishRide);$('resetDemo').addEventListener('click',reset);
-  $('toggleOnline').addEventListener('click',()=>{state.online=!state.online;renderDriver();if(state.online&&!state.hasGps)locate();});
+  $('toggleOnline').addEventListener('click',toggleOnline);
+  $('cancelReq').addEventListener('click',()=>{if(state.ride)post({action:'cancel',id:state.ride.id});endRide(['CANCELADO','Solicitud cancelada.']);});
+  $('driverRequests').addEventListener('click',e=>{const b=e.target.closest('[data-accept]');if(b)acceptRide(b.dataset.accept);});
+  $('dcSend').addEventListener('click',dcSend);$('dcInput').addEventListener('keydown',e=>{if(e.key==='Enter')dcSend();});$('dcOffer').addEventListener('click',dcOffer);$('dcNext').addEventListener('click',dcNext);$('dcFinish').addEventListener('click',dcFinish);
   if('serviceWorker' in navigator && location.protocol.startsWith('http'))navigator.serviceWorker.register('/sw.js').catch(()=>{});
   initMap();renderDriver();renderAdmin();
 })();

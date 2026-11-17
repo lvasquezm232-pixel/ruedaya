@@ -1,5 +1,5 @@
 // Rueda Bca · Service worker mínimo (instalable + respaldo sin conexión)
-const CACHE = 'ruedabca-v1';
+const CACHE = 'ruedabca-v2';
 const BASE = ['/', '/index.html', '/icon-192.png', '/icon-512.png'];
 
 self.addEventListener('install', (event) => {
@@ -21,7 +21,8 @@ self.addEventListener('activate', (event) => {
 // Chrome exige un manejador "fetch" para ofrecer la instalación directa.
 self.addEventListener('fetch', (event) => {
   const req = event.request;
-  if (req.method !== 'GET' || new URL(req.url).origin !== self.location.origin) return;
+  const u = new URL(req.url);
+  if (req.method !== 'GET' || u.origin !== self.location.origin || u.pathname.startsWith('/api/')) return;
 
   event.respondWith(
     fetch(req)
