@@ -30,7 +30,7 @@ async function setStatus(field, status) {
   await redis(['HSET', KEY, field, JSON.stringify(u)]);
   return u;
 }
-const line = (u, i) => (i + 1) + '. ' + (ICON[u.status] || '⏳') + ' ' + u.name + ' · DNI ' + u.dni + ' · ' + (u.type === 'driver' ? 'Mototaxista ' + u.plate : 'Pasajero');
+const line = (u, i) => (i + 1) + '. ' + (ICON[u.status] || '⏳') + ' ' + u.name + ' · DNI ' + u.dni + (u.wa ? ' · WhatsApp ' + u.wa : '') + ' · ' + (u.type === 'driver' ? 'Mototaxista ' + u.plate : 'Pasajero');
 async function sendList(list, title) {
   if (!list.length) return tg('sendMessage', { chat_id: CHAT, text: title + ': no hay registros.' });
   let text = title + ' (' + list.length + ')\n\n';
@@ -43,10 +43,28 @@ async function sendList(list, title) {
 }
 
 module.exports = async (req, res) => {
+  // Diagnóstico: abre /api/telegram?info=TU_CLAVE para ver si el bot está bien conectado
+  if (req.method === 'GET' && req.query && req.query.info) {
+    if (!SECRET || req.query.info !== SECRET) return res.status(401).send('Clave incorrecta, o TELEGRAM_SECRET no está configurada en Vercel.');
+    try {
+      const w = (await tg('getWebhookInfo', {})).result || {};
+      const me = (await tg('getMe', {})).result || {};
+      const esperado = 'https://' + req.headers.host + '/api/telegram';
+      return res.status(200).type('text/plain').send([
+        'Variables en Vercel: TOKEN ' + (TG ? 'OK' : 'FALTA') + ' · CHAT_ID ' + (CHAT ? 'OK' : 'FALTA') + ' · SECRET ' + (SECRET ? 'OK' : 'FALTA'),
+        'Bot: ' + (me.username ? '@' + me.username : 'token inválido'),
+        'Webhook conectado a: ' + (w.url || '(ninguno: falta abrir el enlace ?setup=TU_CLAVE)'),
+        'Debe ser: ' + esperado + (w.url && w.url !== esperado ? '   <-- NO COINCIDE' : ''),
+        'Pendientes sin entregar: ' + (w.pending_update_count || 0),
+        'Último error de Telegram: ' + (w.last_error_message || 'ninguno')
+      ].join('\n'));
+    } catch (e) { return res.status(500).send('Error: ' + String(e.message || e)); }
+  }
   // Configuración con un clic: abre /api/telegram?setup=TU_CLAVE y conecta el bot solo (el token no sale de Vercel)
   if (req.method === 'GET' && req.query && req.query.setup) {
     if (!SECRET || !TG || !CHAT) return res.status(500).send('Faltan variables en Vercel: TELEGRAM_BOT_TOKEN, TELEGRAM_CHAT_ID y TELEGRAM_SECRET. Agrégalas y haz Redeploy.');
     if (req.query.setup !== SECRET) return res.status(401).send('Clave incorrecta.');
+    if (!/^[A-Za-z0-9_-]{1,256}$/.test(SECRET)) return res.status(400).send('TELEGRAM_SECRET solo puede tener letras, números, _ y -. Cámbiala en Vercel, haz Redeploy y abre el enlace otra vez.');
     try {
       const r = await tg('setWebhook', { url: 'https://' + req.headers.host + '/api/telegram', secret_token: SECRET, allowed_updates: ['message', 'callback_query'] });
       if (r.ok) await tg('sendMessage', { chat_id: CHAT, text: '✅ Bot conectado con Rueda Bca. Escribe /pendientes o /usuarios para ver los registros.' });
@@ -61,8 +79,10 @@ module.exports = async (req, res) => {
       const q = b.callback_query;
       if (String(q.from && q.from.id) !== CHAT) { await tg('answerCallbackQuery', { callback_query_id: q.id, text: 'No autorizado' }); return res.status(200).json({ ok: true }); }
       const [act, dni, uid] = String(q.data || '').split(':');
-      const u = await setStatus(dni + ':' + uid, act === 'ap' ? 'APROBADO' : 'RECHAZADO');
-      await tg('answerCallbackQuery', { callback_query_id: q.id, text: u ? (act === 'ap' ? 'Aprobado' : 'Rechazado') : 'No se encontró el registro' });
+      let u = null, msg = 'Error al guardar';
+      try { u = await setStatus(dni + ':' + uid, act === 'ap' ? 'APROBADO' : 'RECHAZADO'); msg = u ? (act === 'ap' ? 'Aprobado' : 'Rechazado') : 'No se encontró el registro'; }
+      catch (e) { msg = 'Error: ' + String(e.message || e).slice(0, 150); }
+      await tg('answerCallbackQuery', { callback_query_id: q.id, text: msg, show_alert: !u });
       if (u && q.message) await tg('editMessageText', { chat_id: CHAT, message_id: q.message.message_id, text: (q.message.text || '') + '\n\n' + (act === 'ap' ? '✅ APROBADO' : '❌ RECHAZADO') });
     } else if (b.message && String(b.message.chat && b.message.chat.id) === CHAT) {
       const t = String(b.message.text || '').trim(), [cmd, arg] = t.split(/\s+/);
