@@ -30,7 +30,7 @@ async function setStatus(field, status) {
   await redis(['HSET', KEY, field, JSON.stringify(u)]);
   return u;
 }
-const line = (u, i) => (i + 1) + '. ' + (ICON[u.status] || '⏳') + ' ' + u.name + ' · DNI ' + u.dni + ' · ' + (u.type === 'driver' ? 'Mototaxista ' + u.plate : 'Pasajero');
+const line = (u, i) => (i + 1) + '. ' + (ICON[u.status] || '⏳') + ' ' + u.name + ' · DNI ' + u.dni + (u.wa ? ' · WhatsApp ' + u.wa : '') + ' · ' + (u.type === 'driver' ? 'Mototaxista ' + u.plate : 'Pasajero');
 async function sendList(list, title) {
   if (!list.length) return tg('sendMessage', { chat_id: CHAT, text: title + ': no hay registros.' });
   let text = title + ' (' + list.length + ')\n\n';
