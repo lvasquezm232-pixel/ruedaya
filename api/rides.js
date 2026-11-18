@@ -39,7 +39,7 @@ module.exports = async (req, res) => {
       const x = b.ride || {};
       const nid = S(x.id, 60);
       if (!nid) return res.status(400).json({ error: 'Falta id' });
-      r = all[nid] = { id: nid, pickup: S(x.pickup), pickupLat: N(x.pickupLat), pickupLng: N(x.pickupLng), destination: S(x.destination), destLat: N(x.destLat), destLng: N(x.destLng), status: 'BUSCANDO', responses: [], turn: 0, driverId: null, messages: [], offers: {}, fare: null, createdAt: Date.now() };
+      r = all[nid] = { id: nid, pickup: S(x.pickup), pickupLat: N(x.pickupLat), pickupLng: N(x.pickupLng), passenger: S(x.passenger, 80), destination: S(x.destination), destLat: N(x.destLat), destLng: N(x.destLng), status: 'BUSCANDO', responses: [], turn: 0, driverId: null, messages: [], offers: {}, fare: null, createdAt: Date.now() };
     } else if (r) {
       const dId = S(b.driverId, 60);
       if (act === 'respond' && ['BUSCANDO', 'NEGOCIANDO'].includes(r.status) && b.driver && !r.responses.some(x => x.id === S(b.driver.id, 60))) {
