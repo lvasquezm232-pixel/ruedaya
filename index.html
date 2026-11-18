@@ -60,6 +60,15 @@
         <div id="driverChat" class="hidden" style="margin-top:15px">
           <h3 class="section-title">Viaje activo</h3>
           <div class="tiny" id="dcTitle" style="margin-bottom:8px"></div>
+          <div id="navBox" class="confirm-box" style="margin:0 0 12px">
+            <strong>🧭 Cómo llegar</strong>
+            <div class="tiny" style="margin:8px 0 5px">Al pasajero</div>
+            <div class="two-btn"><button class="btn btn-primary" data-guide="pickup">Guiarme aquí</button><button class="btn btn-soft" data-gmaps="pickup">Google Maps</button></div>
+            <div class="tiny" style="margin:10px 0 5px">Al destino del pasajero</div>
+            <div class="two-btn"><button class="btn btn-primary" data-guide="dest">Guiarme aquí</button><button class="btn btn-soft" data-gmaps="dest">Google Maps</button></div>
+            <div id="navSummary" class="tiny" style="margin-top:10px;font-weight:800;color:#1a5f45"></div>
+            <ol id="navSteps" style="margin:8px 0 0;padding-left:20px;max-height:220px;overflow:auto;font-size:12px;line-height:1.55"></ol>
+          </div>
           <div class="chat"><div class="chat-messages" id="dcMessages"></div><div class="chat-compose"><input id="dcInput" placeholder="Escribe tu mensaje…" maxlength="500" /><button id="dcSend" aria-label="Enviar mensaje">➤</button></div></div>
           <div id="dcNeg" class="confirm-box"><strong id="dcNote">Conversa con el pasajero y acuerden el precio.</strong><div class="field" style="margin:9px 0"><input id="dcFare" type="number" min="0.5" step="0.5" placeholder="Precio acordado en S/" /></div><div class="two-btn"><button class="btn btn-primary" id="dcOffer">Aceptar precio</button><button class="btn btn-danger" id="dcNext">No hay acuerdo</button></div></div>
           <div id="dcDone" class="notice success-notice hidden"><b>✓ VIAJE CONFIRMADO</b><div id="dcDoneText"></div><button class="btn btn-soft btn-block" id="dcFinish" style="margin-top:10px">Finalizar viaje</button></div>
@@ -317,7 +326,44 @@
   function dcOffer(){const f=Number($('dcFare').value);if(!state.dRide||!Number.isFinite(f)||f<=0){alert('Escribe un precio válido en soles.');return;}dPost({action:'offer',role:'conductor',fare:f});$('dcNote').textContent=`Ofreciste S/ ${f.toFixed(2)}. Esperando que el pasajero acepte el mismo precio…`;}
   function dcNext(){if(state.dRide)dPost({action:'next'});}
   function dcFinish(){if(state.dRide){state.stats.jobs++;dPost({action:'finish'});}}
-  function clearPickup(){(state.dLayers||[]).forEach(l=>{if(state.map)state.map.removeLayer(l);});state.dLayers=[];state.pickupId=null;}
+  function clearGuide(){(state.gLayers||[]).forEach(l=>{if(state.map)state.map.removeLayer(l);});state.gLayers=[];const n=$('navSteps'),m=$('navSummary');if(n)n.innerHTML='';if(m)m.textContent='';}
+  function clearPickup(){(state.dLayers||[]).forEach(l=>{if(state.map)state.map.removeLayer(l);});state.dLayers=[];state.pickupId=null;clearGuide();}
+  const MOD={left:'a la izquierda',right:'a la derecha','slight left':'ligeramente a la izquierda','slight right':'ligeramente a la derecha','sharp left':'en curva cerrada a la izquierda','sharp right':'en curva cerrada a la derecha',straight:'recto',uturn:'dando la vuelta'};
+  function stepEs(st){
+    const m=st.maneuver||{},t=m.type,mod=MOD[m.modifier]||'',nm=st.name?(' por '+st.name):'';
+    if(t==='depart')return 'Sal'+nm;
+    if(t==='arrive')return 'Llegaste a tu punto de destino';
+    if(t==='roundabout'||t==='rotary'||t==='roundabout turn')return 'En la rotonda toma la salida '+(m.exit||'')+nm;
+    if(t==='continue'||t==='new name'||m.modifier==='straight')return 'Sigue recto'+nm;
+    if(m.modifier==='uturn')return 'Da la vuelta'+nm;
+    return 'Gira '+(mod||'')+nm;
+  }
+  const fmtD=d=>d<1000?(Math.max(10,Math.round(d/10)*10)+' m'):((d/1000).toFixed(1)+' km');
+  function navTarget(k){
+    const a=state.dRide;if(!a)return null;
+    if(k==='pickup')return a.pickupLat!=null?{lat:a.pickupLat,lng:a.pickupLng,label:'el pasajero'}:null;
+    return a.destLat!=null?{lat:a.destLat,lng:a.destLng,label:'el destino'}:null;
+  }
+  async function guideTo(k){
+    const t=navTarget(k);if(!t){alert('Este punto no tiene ubicación en el mapa.');return;}
+    if(!state.hasGps){state.afterFix=()=>guideTo(k);locate();$('navSummary').textContent='Buscando tu ubicación GPS…';return;}
+    $('navSummary').textContent='Calculando ruta…';$('navSteps').innerHTML='';
+    try{
+      const r=await withTimeout(fetch('https://router.project-osrm.org/route/v1/driving/'+state.userLng+','+state.userLat+';'+t.lng+','+t.lat+'?overview=full&geometries=geojson&steps=true').then(x=>x.json()),10000);
+      if(!r.routes||!r.routes.length){$('navSummary').textContent='No hay ruta en auto hasta '+t.label+'.';return;}
+      const rt=r.routes[0],pts=rt.geometry.coordinates.map(c=>[c[1],c[0]]);
+      clearGuide();
+      state.gLayers=[L.polyline(pts,{color:'#fff',weight:12,opacity:.95,interactive:false}).addTo(state.map),L.polyline(pts,{color:'#0b8a5c',weight:7,opacity:1,interactive:false}).addTo(state.map)];
+      state.follow=false;state.map.fitBounds(state.gLayers[1].getBounds(),{padding:[60,60]});
+      const min=Math.max(1,Math.round(rt.duration/60));
+      $('navSummary').textContent='Hacia '+t.label+': '+min+' min · '+fmtD(rt.distance);
+      $('navSteps').innerHTML=rt.legs[0].steps.map(st=>`<li>${esc(stepEs(st))}${st.distance>0?` <span class="tiny">· ${fmtD(st.distance)}</span>`:''}</li>`).join('');
+    }catch(e){$('navSummary').textContent='No se pudo calcular la ruta. Revisa tu conexión.';}
+  }
+  function openGmaps(k){
+    const t=navTarget(k);if(!t){alert('Este punto no tiene ubicación en el mapa.');return;}
+    window.open('https://www.google.com/maps/dir/?api=1&destination='+t.lat+','+t.lng+'&travelmode=driving','_blank','noopener');
+  }
   async function showRideOnMap(a){
     if(!state.map||a.pickupLat==null||state.pickupId===a.id)return;
     clearPickup();state.pickupId=a.id;const id=a.id;
@@ -345,7 +391,7 @@
     $('driverJobs').textContent=state.stats.jobs;$('driverQueue').textContent=state.online?'ACTIVO':'—';$('driverGps').textContent=state.hasGps?'Sí':'No';
     const list=state.online?(state.openRides||[]).filter(r=>{const m=r.responses.find(x=>x.id===uid);return (!a||r.id!==a.id)&&['BUSCANDO','NEGOCIANDO'].includes(r.status)&&!(m&&m.status==='FINALIZADO');}):[];
     $('driverRequests').innerHTML=list.length?list.map(r=>{const m=r.responses.find(x=>x.id===uid),dk=state.hasGps?kmBetween(state.userLat,state.userLng,r.pickupLat,r.pickupLng):null;return `<div class="driver-card"><div class="driver-top"><div class="avatar">P</div><div><strong>Solicitud de pasajero</strong><small>${esc(r.pickup)} → ${esc(r.destination)}</small></div></div><div class="tiny" style="margin-top:9px">${dk!=null?`A ${dk.toFixed(1)} km de ti · `:''}${r.status==='BUSCANDO'?'Esperando conductor.':'Otro conductor está negociando; puedes ponerte en cola.'}</div><div class="driver-controls"><button class="btn btn-ghost" data-view="${esc(r.id)}">Ver en el mapa</button>${m?'<span class="tag amber">EN ESPERA</span>':`<button class="btn btn-primary" data-accept="${esc(r.id)}">Aceptar solicitud</button>`}</div></div>`;}).join(''):'<div class="empty"><b>No hay solicitudes todavía</b>Cuando un pasajero solicite una moto, aparecerá aquí.</div>';
-    $('driverChat').classList.toggle('hidden',!a);
+    $('driverChat').classList.toggle('hidden',!a);$('navBox').classList.toggle('hidden',!a);
     if(a){
       const conf=a.status==='CONFIRMADO';
       $('dcTitle').textContent=`${a.pickup} → ${a.destination}`;
@@ -363,6 +409,7 @@
   $('locateBtn').addEventListener('click',locate);$('gpsBtn').addEventListener('click',locate);$('requestBtn').addEventListener('click',startRequest);$('sendBtn').addEventListener('click',sendMessage);$('messageInput').addEventListener('keydown',e=>{if(e.key==='Enter')sendMessage();});$('nextBtn').addEventListener('click',nextDriver);$('confirmBtn').addEventListener('click',confirmDeal);$('finishBtn').addEventListener('click',finishRide);$('resetDemo').addEventListener('click',reset);
   $('toggleOnline').addEventListener('click',toggleOnline);
   $('cancelReq').addEventListener('click',()=>{if(state.ride)post({action:'cancel',id:state.ride.id});endRide(['CANCELADO','Solicitud cancelada.']);});
+  $('navBox').addEventListener('click',e=>{const g=e.target.closest('[data-guide]');if(g){guideTo(g.dataset.guide);return;}const m=e.target.closest('[data-gmaps]');if(m)openGmaps(m.dataset.gmaps);});
   $('driverRequests').addEventListener('click',e=>{const v=e.target.closest('[data-view]');if(v){const r=(state.openRides||[]).find(x=>x.id===v.dataset.view);if(r){state.previewId=r.id;state.pickupId=null;showRideOnMap(r);}return;}const b=e.target.closest('[data-accept]');if(b)acceptRide(b.dataset.accept);});
   $('dcSend').addEventListener('click',dcSend);$('dcInput').addEventListener('keydown',e=>{if(e.key==='Enter')dcSend();});$('dcOffer').addEventListener('click',dcOffer);$('dcNext').addEventListener('click',dcNext);$('dcFinish').addEventListener('click',dcFinish);
   if('serviceWorker' in navigator && location.protocol.startsWith('http'))navigator.serviceWorker.register('/sw.js').catch(()=>{});
