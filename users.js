@@ -49,6 +49,7 @@ module.exports = async (req, res) => {
     // Consulta de estado: solo responde si el DNI y el celular coinciden con el registro
     if (req.method === 'GET') {
       const q = req.query || {};
+      if (q.version) return res.status(200).json({ version: 'whatsapp-v2' }); // para comprobar que este archivo es el publicado
       const u = await lookup(S(q.dni, 8), S(q.uid, 60));
       return res.status(200).json({ status: u ? u.status : 'NO_ENCONTRADO' });
     }
