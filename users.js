@@ -67,7 +67,7 @@ module.exports = async (req, res) => {
     const prev = await lookup(dni, uid);
     if (!waOk && (!prev || x.wa)) return res.status(400).json({ error: 'Falta el número de WhatsApp (9 dígitos, empieza con 9)' });
     if (prev && prev.name === name && prev.type === type && prev.plate === plate) {
-      if (waOk && prev.wa !== wa) { prev.wa = wa; prev.updatedAt = Date.now(); await save(prev); } // solo cambió el WhatsApp: no pide nueva aprobación
+      if (waOk && prev.wa !== wa) { prev.wa = wa; prev.updatedAt = Date.now(); await save(prev); if (needsApproval()) { try { await tg('sendMessage', { chat_id: CHAT, text: '📱 WhatsApp registrado — ' + prev.name + ' (DNI ' + prev.dni + ')\n+51 ' + wa + '\nhttps://wa.me/51' + wa, disable_web_page_preview: true }); } catch (e) { /* no bloquea el registro */ } } } // solo cambió el WhatsApp: no pide nueva aprobación
       return res.status(200).json({ ok: true, status: prev.status });
     }
 
